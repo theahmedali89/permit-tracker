@@ -1,0 +1,123 @@
+import { createClient } from "@/lib/supabase/server";
+import { redirect, notFound } from "next/navigation";
+import { AppShell } from "@/components/app-shell";
+import { Card, Badge } from "@/components/ui";
+import Link from "next/link";
+
+export default async function PermitDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/signin");
+
+  const { data: permit } = await supabase
+    .from("permits")
+    .select("*, projects(name)")
+    .eq("id", id)
+    .single();
+
+  if (!permit) notFound();
+
+  const { data: documents } = await supabase
+    .from("documents")
+    .select("*")
+    .eq("permit_id", id)
+    .order("created_at", { ascending: false });
+
+  const { data: deadlines } = await supabase
+    .from("deadlines")
+    .select("*")
+    .eq("resource_type", "permit")
+    .eq("resource_id", id)
+    .order("due_date");
+
+  return (
+    <AppShell>
+      <div className="mb-6">
+        <Link href="/permits" className="text-sm text-blue-600 hover:text-blue-500">
+          ← Back to Permits
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+          {permit.permit_type}
+          {permit.permit_number && ` - ${permit.permit_number}`}
+        </h1>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4">Details</h2>
+          <dl className="space-y-3">
+            <div className="flex justify-between">
+              <dt className="text-sm text-gray-600 dark:text-gray-400">Status</dt>
+              <dd><Badge color={permit.status === "active" ? "green" : permit.status === "expired" ? "red" : "yellow"}>{permit.status}</Badge></dd>
+            </div>
+            {permit.projects && (
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-600 dark:text-gray-400">Project</dt>
+                <dd className="text-sm font-medium">{permit.projects.name}</dd>
+              </div>
+            )}
+            {permit.issuing_authority && (
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-600 dark:text-gray-400">Authority</dt>
+                <dd className="text-sm">{permit.issuing_authority}</dd>
+              </div>
+            )}
+            {permit.expiration_date && (
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-600 dark:text-gray-400">Expires</dt>
+                <dd className="text-sm">{new Date(permit.expiration_date).toLocaleDateString()}</dd>
+              </div>
+            )}
+            {permit.notes && (
+              <div>
+                <dt className="text-sm text-gray-600 dark:text-gray-400 mb-1">Notes</dt>
+                <dd className="text-sm">{permit.notes}</dd>
+              </div>
+            )}
+          </dl>
+        </Card>
+
+        <div className="space-y-6">
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Deadlines</h2>
+            {!deadlines || deadlines.length === 0 ? (
+              <p className="text-sm text-gray-500">No deadlines</p>
+            ) : (
+              <div className="space-y-2">
+                {deadlines.map((d: any) => (
+                  <div key={d.id} className="flex justify-between text-sm">
+                    <span className="capitalize">{d.deadline_type}</span>
+                    <span>{new Date(d.due_date).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Documents</h2>
+            {!documents || documents.length === 0 ? (
+              <p className="text-sm text-gray-500">No documents uploaded</p>
+            ) : (
+              <div className="space-y-2">
+                {documents.map((doc: any) => (
+                  <div key={doc.id} className="text-sm">
+                    📄 {doc.file_name}
+                    <span className="text-gray-500 ml-2">
+                      ({(doc.file_size / 1024).toFixed(0)} KB)
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
+      </div>
+    </AppShell>
+  );
+}
