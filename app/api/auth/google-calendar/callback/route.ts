@@ -7,10 +7,15 @@ import { getOAuthClient } from "../route";
 // GET /api/auth/google-calendar/callback — handle OAuth callback
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
+  // Always redirect back to the same host the request came in on, so the
+  // whole OAuth round-trip stays on one deployment URL (no build-time env
+  // var, no old/new URL confusion).
+  const origin = request.nextUrl.origin;
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/signin?error=auth_required`
+      `${origin}/signin?error=auth_required`
     );
   }
 
@@ -19,7 +24,7 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get("state"); // organization_id
   const error = searchParams.get("error");
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = origin;
 
   if (error || !code) {
     return NextResponse.redirect(
@@ -32,7 +37,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const oauth2Client = getOAuthClient();
+    // Must use the SAME redirect_uri that was sent to Google in the
+    // authorize step — derived from this request's host, matching exactly.
+    const oauth2Client = getOAuthClient(
+      `${origin}/api/auth/google-calendar/callback`
+    );
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
 
