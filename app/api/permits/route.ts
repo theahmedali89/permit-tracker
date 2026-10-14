@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get("status");
   const projectId = searchParams.get("project_id");
   const search = searchParams.get("search");
+  const id = searchParams.get("id");
 
   let query = supabase
     .from("permits")
@@ -31,6 +32,7 @@ export async function GET(request: NextRequest) {
     .eq("organization_id", orgId)
     .order("expiration_date", { ascending: true });
 
+  if (id) query = query.eq("id", id);
   if (status) query = query.eq("status", status);
   if (projectId) query = query.eq("project_id", projectId);
   if (search) query = query.or(`permit_number.ilike.%${search}%,permit_type.ilike.%${search}%`);
@@ -52,12 +54,22 @@ export async function POST(request: NextRequest) {
   const {
     project_id, permit_type, permit_number, issuing_authority,
     jurisdiction, issue_date, expiration_date, renewal_deadline,
-    notes, source_type,
+    notes, source_type, custom_fields,
   } = body;
 
   if (!permit_type) return NextResponse.json({ error: "Permit type required" }, { status: 400 });
 
   const status = calculatePermitStatus(expiration_date, renewal_deadline);
+
+  // Sanitize custom fields: plain string key-value object only
+  let cleanCustomFields: Record<string, string> = {};
+  if (custom_fields && typeof custom_fields === "object" && !Array.isArray(custom_fields)) {
+    for (const [k, v] of Object.entries(custom_fields)) {
+      if (typeof k === "string" && k.trim() && typeof v === "string") {
+        cleanCustomFields[k.trim().slice(0, 64)] = v.slice(0, 500);
+      }
+    }
+  }
 
   const { data, error } = await supabase
     .from("permits")
@@ -70,6 +82,7 @@ export async function POST(request: NextRequest) {
       renewal_deadline: renewal_deadline || null,
       status, notes,
       source_type: source_type || "user_provided",
+      custom_fields: cleanCustomFields,
     })
     .select()
     .single();
@@ -144,6 +157,18 @@ export async function PATCH(request: NextRequest) {
     if (updates[f] !== undefined) filtered[f] = updates[f] || null;
   }
   if (updates.status) filtered.status = updates.status;
+  // Sanitize custom fields: plain string key-value object only
+  if (updates.custom_fields !== undefined) {
+    const clean: Record<string, string> = {};
+    if (updates.custom_fields && typeof updates.custom_fields === "object" && !Array.isArray(updates.custom_fields)) {
+      for (const [k, v] of Object.entries(updates.custom_fields)) {
+        if (typeof k === "string" && k.trim() && typeof v === "string") {
+          clean[k.trim().slice(0, 64)] = v.slice(0, 500);
+        }
+      }
+    }
+    filtered.custom_fields = clean;
+  }
 
   const { data, error } = await supabase
     .from("permits")

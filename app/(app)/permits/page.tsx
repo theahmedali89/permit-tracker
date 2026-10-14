@@ -52,6 +52,9 @@ export default async function PermitsPage({
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Permits</h1>
         <div className="flex gap-2">
+          <Link href="/permits/import" className="px-3 py-2 text-sm rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600">
+            📤 Import CSV
+          </Link>
           <a href="/api/export?type=permits" className="px-3 py-2 text-sm rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600">
             📥 Export CSV
           </a>

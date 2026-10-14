@@ -3,6 +3,8 @@ import { redirect, notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Card, Badge } from "@/components/ui";
 import Link from "next/link";
+import { DocumentUpload } from "./upload";
+import { DeadlineAdd } from "./deadline-add";
 
 export default async function PermitDetailPage({
   params,
@@ -81,10 +83,47 @@ export default async function PermitDetailPage({
                 <dd className="text-sm">{new Date(permit.expiration_date).toLocaleDateString()}</dd>
               </div>
             )}
+            {permit.renewal_url ? (
+              <div className="flex justify-between items-center">
+                <dt className="text-sm text-gray-600 dark:text-gray-400">Renewal</dt>
+                <dd>
+                  <a
+                    href={permit.renewal_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-500"
+                  >
+                    Renew online ↗
+                  </a>
+                </dd>
+              </div>
+            ) : (
+              <div className="flex justify-between items-center">
+                <dt className="text-sm text-gray-600 dark:text-gray-400">Renewal</dt>
+                <dd>
+                  <Link href="/ahj" className="text-sm text-blue-600 hover:text-blue-500">
+                    Find AHJ portal →
+                  </Link>
+                </dd>
+              </div>
+            )}
             {permit.notes && (
               <div>
                 <dt className="text-sm text-gray-600 dark:text-gray-400 mb-1">Notes</dt>
                 <dd className="text-sm">{permit.notes}</dd>
+              </div>
+            )}
+            {permit.custom_fields && Object.keys(permit.custom_fields).length > 0 && (
+              <div>
+                <dt className="text-sm text-gray-600 dark:text-gray-400 mb-1">Custom Fields</dt>
+                <dd className="space-y-1">
+                  {Object.entries(permit.custom_fields).map(([k, v]) => (
+                    <div key={k} className="flex justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">{k}</span>
+                      <span className="font-medium">{String(v)}</span>
+                    </div>
+                  ))}
+                </dd>
               </div>
             )}
           </dl>
@@ -94,9 +133,7 @@ export default async function PermitDetailPage({
           <Card className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Deadlines</h2>
-              <Link href={`/permits/${id}/edit`} className="text-sm text-blue-600 hover:text-blue-500">
-                + Manage
-              </Link>
+              <DeadlineAdd permitId={id} />
             </div>
             {!deadlines || deadlines.length === 0 ? (
               <p className="text-sm text-gray-500">No deadlines</p>
@@ -115,9 +152,7 @@ export default async function PermitDetailPage({
           <Card className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Documents</h2>
-              <Link href={`/permits/${id}/edit`} className="text-sm text-blue-600 hover:text-blue-500">
-                + Manage
-              </Link>
+              <DocumentUpload permitId={id} />
             </div>
             {!documents || documents.length === 0 ? (
               <p className="text-sm text-gray-500">No documents uploaded</p>

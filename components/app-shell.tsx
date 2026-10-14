@@ -10,6 +10,7 @@ const nav = [
   { href: "/permits", label: "Permits", icon: "📋" },
   { href: "/licenses", label: "Licenses", icon: "📜" },
   { href: "/inspections", label: "Inspections", icon: "🔍" },
+  { href: "/ahj", label: "AHJ Directory", icon: "🏛️" },
   { href: "/calendar", label: "Calendar", icon: "📅" },
   { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
