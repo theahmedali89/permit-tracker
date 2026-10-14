@@ -1,10 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-export default async function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; message?: string }>;
+}) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect("/dashboard");
+
+  const params = await searchParams;
+  const error = params.error;
+  const message = params.message;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
@@ -14,6 +22,16 @@ export default async function SignInPage() {
             Sign in to your account
           </h2>
         </div>
+        {error && (
+          <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800">
+            <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+          </div>
+        )}
+        {message && (
+          <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-4 border border-green-200 dark:border-green-800">
+            <p className="text-sm text-green-700 dark:text-green-400">{message}</p>
+          </div>
+        )}
         <form className="mt-8 space-y-6" action="/auth/signin" method="post">
           <div className="rounded-md shadow-sm -space-y-px">
             <div>

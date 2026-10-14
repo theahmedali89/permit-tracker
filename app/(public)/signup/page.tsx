@@ -1,10 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-export default async function SignUpPage() {
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect("/dashboard");
+
+  const params = await searchParams;
+  const error = params.error;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
@@ -17,6 +24,11 @@ export default async function SignUpPage() {
             Start tracking permits in minutes
           </p>
         </div>
+        {error && (
+          <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800">
+            <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+          </div>
+        )}
         <form className="mt-8 space-y-6" action="/auth/signup" method="post">
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
