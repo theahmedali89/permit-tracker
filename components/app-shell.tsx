@@ -11,6 +11,7 @@ const nav = [
   { href: "/licenses", label: "Licenses", icon: "📜" },
   { href: "/inspections", label: "Inspections", icon: "🔍" },
   { href: "/ahj", label: "AHJ Directory", icon: "🏛️" },
+  { href: "/subcontractors", label: "Subcontractors", icon: "👷" },
   { href: "/reports", label: "Reports", icon: "📈" },
   { href: "/calendar", label: "Calendar", icon: "📅" },
   { href: "/settings", label: "Settings", icon: "⚙️" },

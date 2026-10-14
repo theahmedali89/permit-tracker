@@ -66,3 +66,50 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(data, { status: 201 });
 }
+
+export async function PATCH(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data: membership } = await supabase
+    .from("organization_members")
+    .select("organization_id")
+    .eq("user_id", user.id)
+    .limit(1)
+    .single();
+  if (!membership) return NextResponse.json({ error: "No organization" }, { status: 400 });
+
+  const body = await request.json();
+  const { id, ...updates } = body;
+  if (!id) return NextResponse.json({ error: "Project ID required" }, { status: 400 });
+
+  const allowedFields = [
+    "name", "customer", "address", "city", "state", "zip",
+    "project_type", "start_date", "expected_completion", "notes", "status",
+  ];
+  const filtered: Record<string, any> = {};
+  for (const f of allowedFields) {
+    if (updates[f] !== undefined) filtered[f] = updates[f] || null;
+  }
+
+  const { data, error } = await supabase
+    .from("projects")
+    .update(filtered)
+    .eq("id", id)
+    .eq("organization_id", membership.organization_id)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  await supabase.from("audit_events").insert({
+    organization_id: membership.organization_id,
+    actor_id: user.id,
+    action: "project.updated",
+    entity_type: "project",
+    entity_id: id,
+  });
+
+  return NextResponse.json(data);
+}

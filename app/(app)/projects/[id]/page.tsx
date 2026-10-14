@@ -40,13 +40,21 @@ export default async function ProjectDetailPage({
 
   return (
     <AppShell>
-      <div className="mb-6">
-        <Link href="/projects" className="text-sm text-blue-600 hover:text-blue-500">
-          ← Back to Projects
+      <div className="mb-6 flex justify-between items-start">
+        <div>
+          <Link href="/projects" className="text-sm text-blue-600 hover:text-blue-500">
+            ← Back to Projects
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+            {project.name}
+          </h1>
+        </div>
+        <Link
+          href={`/projects/${id}/edit`}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+        >
+          Edit Project
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-          {project.name}
-        </h1>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

@@ -57,7 +57,8 @@ export default async function InspectionsPage() {
       ) : (
         <div className="space-y-4">
           {inspections.map((insp: any) => (
-            <Card key={insp.id} className="p-4">
+            <Link key={insp.id} href={`/inspections/${insp.id}`}>
+              <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -81,7 +82,8 @@ export default async function InspectionsPage() {
                   {insp.status.replace("_", " ")}
                 </Badge>
               </div>
-            </Card>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

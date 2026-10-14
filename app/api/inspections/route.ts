@@ -79,3 +79,63 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(data, { status: 201 });
 }
+
+export async function PATCH(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const orgId = await getOrgId(supabase, user.id);
+  if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
+
+  const body = await request.json();
+  const { id, status, correction_notes, reinspection_date, ...updates } = body;
+  if (!id) return NextResponse.json({ error: "Inspection ID required" }, { status: 400 });
+
+  const { data: existing } = await supabase
+    .from("inspections")
+    .select("id")
+    .eq("id", id)
+    .eq("organization_id", orgId)
+    .single();
+  if (!existing) return NextResponse.json({ error: "Inspection not found" }, { status: 404 });
+
+  const allowedFields = [
+    "inspection_type", "scheduled_date", "inspector_name", "notes",
+    "project_id", "permit_id", "status", "correction_notes", "reinspection_date",
+  ];
+  const filtered: Record<string, any> = {};
+  for (const f of allowedFields) {
+    if (body[f] !== undefined) filtered[f] = body[f] || null;
+  }
+
+  const { data, error } = await supabase
+    .from("inspections")
+    .update(filtered)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // If failed, create reinspection deadline
+  if (status === "failed" && body.reinspection_date) {
+    await supabase.from("deadlines").insert({
+      organization_id: orgId,
+      resource_type: "inspection",
+      resource_id: id,
+      deadline_type: "reinspection",
+      due_date: body.reinspection_date,
+    });
+  }
+
+  await supabase.from("audit_events").insert({
+    organization_id: orgId,
+    actor_id: user.id,
+    action: `inspection.${status || "updated"}`,
+    entity_type: "inspection",
+    entity_id: id,
+  });
+
+  return NextResponse.json(data);
+}
