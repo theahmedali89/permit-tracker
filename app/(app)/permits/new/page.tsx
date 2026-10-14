@@ -4,12 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Card, Button, Input, Alert } from "@/components/ui";
+import CustomFieldsInput from "@/components/custom-fields-input";
 
 export default function NewPermitPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [projects, setProjects] = useState<any[]>([]);
+  const [customFields, setCustomFields] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetch("/api/projects").then(r => r.json()).then(setProjects);
@@ -22,6 +24,7 @@ export default function NewPermitPage() {
 
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
+    (data as any).custom_fields = customFields;
 
     try {
       const res = await fetch("/api/permits", {
@@ -122,6 +125,7 @@ export default function NewPermitPage() {
               className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             />
           </div>
+          <CustomFieldsInput onChange={setCustomFields} />
           <Button type="submit" disabled={loading}>
             {loading ? "Saving..." : "Create Permit"}
           </Button>

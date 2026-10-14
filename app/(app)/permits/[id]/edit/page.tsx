@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Card, Button, Input, Alert } from "@/components/ui";
+import CustomFieldsInput from "@/components/custom-fields-input";
 import Link from "next/link";
 
 export default function EditPermitPage() {
@@ -35,6 +36,7 @@ export default function EditPermitPage() {
           renewal_deadline: p.renewal_deadline || "",
           notes: p.notes || "",
           status: p.status || "pending",
+          custom_fields: p.custom_fields || {},
         });
       }
       setLoading(false);
@@ -67,7 +69,7 @@ export default function EditPermitPage() {
     }
   }
 
-  function set(field: string, value: string) {
+  function set(field: string, value: any) {
     setForm((f: any) => ({ ...f, [field]: value }));
   }
 
@@ -176,6 +178,10 @@ export default function EditPermitPage() {
               className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             />
           </div>
+          <CustomFieldsInput
+            initial={form.custom_fields}
+            onChange={(v) => set("custom_fields", v)}
+          />
           <Button type="submit" disabled={saving}>
             {saving ? "Saving..." : "Save Changes"}
           </Button>
