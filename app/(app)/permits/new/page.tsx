@@ -36,7 +36,7 @@ export default function NewPermitPage() {
       }
 
       router.push("/permits");
-      router.refresh();
+
     } catch (err: any) {
       setError(err.message);
     } finally {

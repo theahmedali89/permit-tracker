@@ -98,3 +98,69 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(data, { status: 201 });
 }
+
+export async function PATCH(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const orgId = await getOrgId(supabase, user.id);
+  if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
+
+  const body = await request.json();
+  const { id, ...updates } = body;
+  if (!id) return NextResponse.json({ error: "Permit ID required" }, { status: 400 });
+
+  // Only allow updating own org's permit
+  const { data: existing } = await supabase
+    .from("permits")
+    .select("id")
+    .eq("id", id)
+    .eq("organization_id", orgId)
+    .single();
+  if (!existing) return NextResponse.json({ error: "Permit not found" }, { status: 404 });
+
+  // Recalculate status if dates changed
+  if (updates.expiration_date !== undefined || updates.renewal_deadline !== undefined) {
+    const { data: current } = await supabase
+      .from("permits")
+      .select("expiration_date, renewal_deadline")
+      .eq("id", id)
+      .single();
+    updates.status = calculatePermitStatus(
+      updates.expiration_date !== undefined ? updates.expiration_date : current?.expiration_date,
+      updates.renewal_deadline !== undefined ? updates.renewal_deadline : current?.renewal_deadline
+    );
+  }
+
+  // Allow manual status override
+  const allowedFields = [
+    "project_id", "permit_type", "permit_number", "issuing_authority",
+    "jurisdiction", "issue_date", "expiration_date", "renewal_deadline",
+    "notes", "status",
+  ];
+  const filtered: Record<string, any> = {};
+  for (const f of allowedFields) {
+    if (updates[f] !== undefined) filtered[f] = updates[f] || null;
+  }
+  if (updates.status) filtered.status = updates.status;
+
+  const { data, error } = await supabase
+    .from("permits")
+    .update(filtered)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  await supabase.from("audit_events").insert({
+    organization_id: orgId,
+    actor_id: user.id,
+    action: "permit.updated",
+    entity_type: "permit",
+    entity_id: id,
+  });
+
+  return NextResponse.json(data);
+}

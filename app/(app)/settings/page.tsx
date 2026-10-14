@@ -36,11 +36,13 @@ export default async function SettingsPage() {
             </div>
             <div className="flex justify-between">
               <dt className="text-sm text-gray-600 dark:text-gray-400">Trade</dt>
-              <dd className="text-sm font-medium text-gray-900 dark:text-white capitalize">{org.trade}</dd>
+              <dd className="text-sm font-medium text-gray-900 dark:text-white">{
+                ({ general: "General Contractor", roofing: "Roofing", electrical: "Electrical", plumbing: "Plumbing", hvac: "HVAC", solar: "Solar", remodeling: "Remodeling", other: "Other" } as Record<string, string>)[org.trade] || org.trade || "Not set"
+              }</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-sm text-gray-600 dark:text-gray-400">State</dt>
-              <dd className="text-sm font-medium text-gray-900 dark:text-white">{org.state}</dd>
+              <dd className="text-sm font-medium text-gray-900 dark:text-white">{org.state || "Not set"}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-sm text-gray-600 dark:text-gray-400">Your Role</dt>

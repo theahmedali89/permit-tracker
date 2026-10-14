@@ -38,7 +38,7 @@ export default function NewInspectionPage() {
       }
 
       router.push("/inspections");
-      router.refresh();
+
     } catch (err: any) {
       setError(err.message);
     } finally {

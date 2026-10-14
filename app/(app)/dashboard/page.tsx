@@ -26,6 +26,12 @@ export default async function DashboardPage() {
     .eq("organization_id", orgId)
     .eq("status", "active");
 
+  const { count: pendingCount } = await supabase
+    .from("permits")
+    .select("*", { count: "exact", head: true })
+    .eq("organization_id", orgId)
+    .eq("status", "pending");
+
   const { count: expiringCount } = await supabase
     .from("permits")
     .select("*", { count: "exact", head: true })
@@ -67,7 +73,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card className="p-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">Active Permits</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{activeCount || 0}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{(activeCount || 0) + (pendingCount || 0)}</p>
         </Card>
         <Card className="p-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">Expiring Soon</p>

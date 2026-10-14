@@ -37,14 +37,22 @@ export default async function PermitDetailPage({
 
   return (
     <AppShell>
-      <div className="mb-6">
-        <Link href="/permits" className="text-sm text-blue-600 hover:text-blue-500">
-          ← Back to Permits
+      <div className="mb-6 flex justify-between items-start">
+        <div>
+          <Link href="/permits" className="text-sm text-blue-600 hover:text-blue-500">
+            ← Back to Permits
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+            {permit.permit_type}
+            {permit.permit_number && ` - ${permit.permit_number}`}
+          </h1>
+        </div>
+        <Link
+          href={`/permits/${id}/edit`}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+        >
+          Edit Permit
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-          {permit.permit_type}
-          {permit.permit_number && ` - ${permit.permit_number}`}
-        </h1>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -84,7 +92,12 @@ export default async function PermitDetailPage({
 
         <div className="space-y-6">
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Deadlines</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Deadlines</h2>
+              <Link href={`/permits/${id}/edit`} className="text-sm text-blue-600 hover:text-blue-500">
+                + Manage
+              </Link>
+            </div>
             {!deadlines || deadlines.length === 0 ? (
               <p className="text-sm text-gray-500">No deadlines</p>
             ) : (
@@ -100,7 +113,12 @@ export default async function PermitDetailPage({
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Documents</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Documents</h2>
+              <Link href={`/permits/${id}/edit`} className="text-sm text-blue-600 hover:text-blue-500">
+                + Manage
+              </Link>
+            </div>
             {!documents || documents.length === 0 ? (
               <p className="text-sm text-gray-500">No documents uploaded</p>
             ) : (

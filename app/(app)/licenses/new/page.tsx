@@ -31,7 +31,7 @@ export default function NewLicensePage() {
       }
 
       router.push("/licenses");
-      router.refresh();
+
     } catch (err: any) {
       setError(err.message);
     } finally {
