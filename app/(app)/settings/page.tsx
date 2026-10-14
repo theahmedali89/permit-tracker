@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui";
 import { ThemeSettings } from "./theme-settings";
+import { GoogleCalendarConnect } from "./google-calendar";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -72,6 +73,13 @@ export default async function SettingsPage() {
             Appearance
           </h2>
           <ThemeSettings />
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Google Calendar
+          </h2>
+          <GoogleCalendarConnect />
         </Card>
 
         <Card className="p-6">
