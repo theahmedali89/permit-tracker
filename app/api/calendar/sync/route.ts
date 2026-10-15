@@ -99,13 +99,20 @@ export async function POST() {
         continue;
       }
 
+      // Google Calendar treats end.date as EXCLUSIVE for all-day events,
+      // so a same-day start/end is a zero-duration event that may not render.
+      // End on the following day to make it a proper 1-day all-day event.
+      const endDate = new Date(`${d.due_date}T00:00:00Z`);
+      endDate.setUTCDate(endDate.getUTCDate() + 1);
+      const endDateStr = endDate.toISOString().split("T")[0];
+
       await calendar.events.insert({
         calendarId: "primary",
         requestBody: {
           summary: `🔔 ${title}`,
           description,
           start: { date: d.due_date },
-          end: { date: d.due_date },
+          end: { date: endDateStr },
           reminders: {
             useDefault: false,
             overrides: [

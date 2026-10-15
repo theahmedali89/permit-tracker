@@ -2,7 +2,7 @@ import { google } from "googleapis";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
-import { getOAuthClient } from "../route";
+import { getOAuthClient, verifyState } from "../route";
 
 // GET /api/auth/google-calendar/callback — handle OAuth callback
 export async function GET(request: NextRequest) {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get("code");
-  const state = searchParams.get("state"); // organization_id
+  const rawState = searchParams.get("state");
   const error = searchParams.get("error");
 
   const appUrl = origin;
@@ -32,8 +32,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!state) {
-    return NextResponse.redirect(`${appUrl}/settings?calendar=error&reason=no_state`);
+  // Verify the signed state — rejects tampered, expired or missing state
+  const orgId = rawState ? verifyState(rawState) : null;
+  if (!orgId) {
+    return NextResponse.redirect(
+      `${appUrl}/settings?calendar=error&reason=invalid_state`
+    );
   }
 
   try {
@@ -65,7 +69,7 @@ export async function GET(request: NextRequest) {
       .from("google_calendar_tokens")
       .upsert(
         {
-          organization_id: state,
+          organization_id: orgId,
           access_token: tokens.access_token,
           refresh_token: tokens.refresh_token || null,
           expiry_date: tokens.expiry_date || null,
@@ -78,11 +82,11 @@ export async function GET(request: NextRequest) {
     if (dbError) throw dbError;
 
     await serviceClient.from("audit_events").insert({
-      organization_id: state,
+      organization_id: orgId,
       actor_id: user.id,
       action: "google_calendar.connected",
       entity_type: "integration",
-      entity_id: state,
+      entity_id: orgId,
     });
 
     return NextResponse.redirect(`${appUrl}/settings?calendar=connected`);
