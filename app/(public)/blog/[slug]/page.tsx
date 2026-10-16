@@ -53,8 +53,8 @@ export default async function BlogPostPage({
     headline: post.title,
     description: post.excerpt,
     datePublished: post.published_at,
-    author: { "@type": "Organization", name: "Permit Tracker" },
-    publisher: { "@type": "Organization", name: "Permit Tracker" },
+    author: { "@type": "Organization", name: "Permit Warden" },
+    publisher: { "@type": "Organization", name: "Permit Warden" },
   };
 
   return (
@@ -80,7 +80,7 @@ export default async function BlogPostPage({
               day: "numeric",
               year: "numeric",
             })}
-            {" · Permit Tracker"}
+            {" · Permit Warden"}
           </p>
         )}
         <article className="mt-8 prose prose-slate dark:prose-invert max-w-none prose-headings:font-semibold prose-a:text-sky-600 dark:prose-a:text-sky-400">

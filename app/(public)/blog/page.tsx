@@ -5,9 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Blog - Permit guides & compliance tips",
   description:
-    "Practical guides on building permits, licenses, inspections, and renewals for U.S. contractors — plus product updates from Permit Tracker.",
+    "Practical guides on building permits, licenses, inspections, and renewals for U.S. contractors — plus product updates from Permit Warden.",
   openGraph: {
-    title: "Permit Tracker Blog - Permit guides & compliance tips",
+    title: "Permit Warden Blog - Permit guides & compliance tips",
     description:
       "Practical guides on building permits, licenses, inspections, and renewals for U.S. contractors.",
   },
@@ -30,7 +30,7 @@ export default async function BlogIndexPage() {
           href="/signup"
           className="text-sm font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400"
         >
-          &larr; Back to Permit Tracker
+          &larr; Back to Permit Warden
         </Link>
         <h1 className="mt-4 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
           Blog

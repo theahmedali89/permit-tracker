@@ -1,12 +1,12 @@
-# Permit Tracker — Design Brief (Logo & Images)
+# Permit Warden — Design Brief (Logo & Images)
 
 ## 1. What is the app?
 
-**Permit Tracker** is a SaaS web app for **small U.S. contractors** (general contractors, roofers, electricians, plumbers, HVAC, solar installers).
+**Permit Warden** is a SaaS web app for **small U.S. contractors** (general contractors, roofers, electricians, plumbers, HVAC, solar installers).
 
 **One-line pitch:** *"Never miss a permit deadline."*
 
-**Core problem it solves:** Contractors lose money on expired permits, lapsed licenses, failed inspections, and stop-work orders because they track deadlines in Excel sheets and email. Permit Tracker puts every permit, license, inspection, and renewal in one dashboard with automatic email reminders (30 / 14 / 7 / 1 day before expiry).
+**Core problem it solves:** Contractors lose money on expired permits, lapsed licenses, failed inspections, and stop-work orders because they track deadlines in Excel sheets and email. Permit Warden puts every permit, license, inspection, and renewal in one dashboard with automatic email reminders (30 / 14 / 7 / 1 day before expiry).
 
 ## 2. Key features (for visual context)
 
@@ -50,7 +50,7 @@ The logo must work on **white, dark navy, and the blue `#2563eb`** backgrounds.
 ## 6. Assets needed
 
 ### A. Logo (priority)
-- **Style:** Modern minimal mark + wordmark "Permit Tracker".
+- **Style:** Modern minimal mark + wordmark "Permit Warden".
 - **Mark ideas:** shield + checkmark (protection/compliance), or a document/permit paper with a checkmark, or a building + checkmark. Avoid hammers/wrenches clichés unless done elegantly.
 - **Deliverables:** SVG (primary), PNG with transparency (1024px), light version (for dark backgrounds), dark version (for light backgrounds), monochrome single-color version, favicon (32px, legible at small size).
 

@@ -1,4 +1,4 @@
--- Permit Tracker blog seed: 6 SEO posts (generated 2026-10-16).
+-- Permit Warden blog seed: 6 SEO posts (generated 2026-10-16).
 -- Run manually in Supabase SQL editor. Safe to re-run: ON CONFLICT DO NOTHING.
 INSERT INTO blog_posts (slug, title, excerpt, content, published, published_at, meta_title, meta_description) VALUES
 ('how-to-get-building-permit-texas', 'How to Get a Building Permit in Texas', 'Texas has no statewide building permit — permits come from your city or county. This contractor''s guide walks through the exact steps plus official permit portals for Austin, Houston, Dallas, Fort Worth, and San Antonio.', $$# How to Get a Building Permit in Texas: A Contractor's Guide
@@ -107,7 +107,7 @@ Yes. Most Texas jurisdictions set an expiration window — commonly tied to whet
 
 Texas contractors often juggle permits across multiple cities, each with its own portal, expiration rules, and inspection schedules. Missing a renewal or letting a permit lapse can stall a project for weeks.
 
-[Permit Tracker](https://permit-tracker-qaspor.vercel.app/signup) was built for exactly this problem — it tracks all your permits, licenses, and inspections in one dashboard and sends automatic renewal reminders before anything expires, so no deadline slips through the cracks.
+[Permit Warden](https://permit-tracker-qaspor.vercel.app/signup) was built for exactly this problem — it tracks all your permits, licenses, and inspections in one dashboard and sends automatic renewal reminders before anything expires, so no deadline slips through the cracks.
 $$, TRUE, NOW(), 'How to Get a Building Permit in Texas: Contractor Guide', 'Step-by-step guide to getting a building permit in Texas, with official permit portals for Austin, Houston, Dallas, Fort Worth & San Antonio.'),
 ('how-to-get-building-permit-florida', 'How to Get a Building Permit in Florida', 'Florida building permits are issued by cities and counties under the Florida Building Code. This guide covers the steps, documents, and official permit portals for Miami, Orlando, Tampa, and Jacksonville.', $$# How to Get a Building Permit in Florida: A Contractor's Guide
 
@@ -218,7 +218,7 @@ Florida law generally requires a Notice of Commencement to be recorded for impro
 
 Florida contractors deal with layered requirements — state licenses, local registrations, product approvals, floodplain rules, and permits across multiple AHJs. Letting any credential or permit lapse can shut a job down.
 
-[Permit Tracker](https://permit-tracker-qaspor.vercel.app/signup) keeps every permit, license, and inspection in one dashboard with automatic renewal reminders, so nothing expires on your watch.
+[Permit Warden](https://permit-tracker-qaspor.vercel.app/signup) keeps every permit, license, and inspection in one dashboard with automatic renewal reminders, so nothing expires on your watch.
 $$, TRUE, NOW(), 'How to Get a Building Permit in Florida: Contractor Guide', 'Step-by-step guide to Florida building permits under the Florida Building Code, with official portals for Miami, Orlando, Tampa & Jacksonville.'),
 ('how-to-get-building-permit-california', 'How to Get a Building Permit in California', 'California enforces the strict Title 24 energy code and seismic rules through city and county building departments. This guide covers the permit steps plus official portals for LA, San Francisco, San Diego, San Jose, Sacramento, and Fresno.', $$# How to Get a Building Permit in California: A Contractor's Guide
 
@@ -324,7 +324,7 @@ Yes. California jurisdictions typically require work to commence within a set pe
 
 Between CSLB renewals, Title 24 documentation, multi-discipline plan checks, and permit expirations across different cities, California contractors juggle more deadlines than most.
 
-[Permit Tracker](https://permit-tracker-qaspor.vercel.app/signup) puts all your permits, licenses, and inspections in one dashboard with automatic renewal reminders — so nothing lapses while you're focused on the job site.
+[Permit Warden](https://permit-tracker-qaspor.vercel.app/signup) puts all your permits, licenses, and inspections in one dashboard with automatic renewal reminders — so nothing lapses while you're focused on the job site.
 $$, TRUE, NOW(), 'How to Get a Building Permit in California: Guide', 'California building permit guide: Title 24, seismic rules & step-by-step process, with official portals for LA, SF, San Diego, San Jose & more.'),
 ('how-to-get-building-permit-new-york', 'How to Get a Building Permit in New York', 'New York permits are issued locally, with NYC''s Department of Buildings running one of the strictest systems in the country. This guide covers the process plus official portals for NYC, Buffalo, Rochester, Syracuse, and Yonkers.', $$# How to Get a Building Permit in New York: A Contractor's Guide
 
@@ -437,7 +437,7 @@ Address it immediately. Many violations require a licensed professional to certi
 
 New York contractors often work across the DOB system and multiple upstate municipalities simultaneously — each with its own portal, license rules, and expiration timelines.
 
-[Permit Tracker](https://permit-tracker-qaspor.vercel.app/signup) consolidates every permit, license, and inspection into one dashboard with automatic renewal reminders, so no deadline gets lost between jurisdictions.
+[Permit Warden](https://permit-tracker-qaspor.vercel.app/signup) consolidates every permit, license, and inspection into one dashboard with automatic renewal reminders, so no deadline gets lost between jurisdictions.
 $$, TRUE, NOW(), 'How to Get a Building Permit in New York: Guide', 'New York building permit guide: DOB process, registered professionals & steps, with official portals for NYC, Buffalo, Rochester, Syracuse & Yonkers.'),
 ('building-permit-renewal-guide', 'Building Permit Renewal: A Contractor''s Guide', 'Building permits expire — and letting one lapse can stall your project for weeks. This guide explains when renewals are needed, what happens if you miss them, and how to never let a permit expire again.', $$# Building Permit Renewal: A Contractor's Guide
 
@@ -544,7 +544,7 @@ Always request the extension. It's typically cheap or free, takes a phone call o
 
 Permit expirations, license renewals, inspection schedules — across multiple jurisdictions, each with different rules — is too much to track manually. The contractors who never miss a deadline aren't more organized by nature; they just have a system.
 
-[Permit Tracker](https://permit-tracker-qaspor.vercel.app/signup) is that system: every permit, license, and inspection in one dashboard, with automatic renewal reminders at 30, 14, 7, and 1 day out. Set it up once, and never think about expiration dates again.
+[Permit Warden](https://permit-tracker-qaspor.vercel.app/signup) is that system: every permit, license, and inspection in one dashboard, with automatic renewal reminders at 30, 14, 7, and 1 day out. Set it up once, and never think about expiration dates again.
 $$, TRUE, NOW(), 'Building Permit Renewal Guide for Contractors', 'When do building permits need renewal? Timelines, lapse consequences & a system for tracking renewals across every jurisdiction you work in.'),
 ('what-is-ahj-authority-having-jurisdiction', 'What Is an AHJ (Authority Having Jurisdiction)?', 'AHJ stands for Authority Having Jurisdiction — the government body that issues your permits and enforces the code. Learn how to identify yours, why it matters, and how working across multiple AHJs complicates compliance.', $$# What Is an AHJ (Authority Having Jurisdiction)?
 
@@ -617,11 +617,11 @@ This fragmentation causes the most common compliance failures in construction:
 
 The root cause isn't carelessness. It's that no human can reliably track dozens of jurisdiction-specific deadlines in their head or in a spreadsheet.
 
-## How Permit Tracker Solves This
+## How Permit Warden Solves This
 
-This fragmentation is exactly why Permit Tracker includes an **AHJ directory** — a built-in reference of permit authorities with their official portals, so you can always find where to apply and confirm you're dealing with the right jurisdiction. Instead of hunting through bookmarks and old emails, the directory puts every AHJ's front door one click away.
+This fragmentation is exactly why Permit Warden includes an **AHJ directory** — a built-in reference of permit authorities with their official portals, so you can always find where to apply and confirm you're dealing with the right jurisdiction. Instead of hunting through bookmarks and old emails, the directory puts every AHJ's front door one click away.
 
-And for the deadlines themselves, Permit Tracker consolidates every permit, license, and inspection from every AHJ into a single dashboard, with automatic reminders before anything expires. One system, every jurisdiction.
+And for the deadlines themselves, Permit Warden consolidates every permit, license, and inspection from every AHJ into a single dashboard, with automatic reminders before anything expires. One system, every jurisdiction.
 
 ## Frequently Asked Questions
 
@@ -649,6 +649,6 @@ Start with our AHJ directory, which links directly to official permit portals by
 
 The AHJ concept is simple, but its implications run through everything a contractor does — from bidding (which jurisdiction's fees and timelines apply?) to closeout (whose final inspection and certificate do you need?).
 
-[Permit Tracker](https://permit-tracker-qaspor.vercel.app/signup) was built for contractors who work across jurisdictions: one dashboard for every permit and deadline, an AHJ directory for finding the right authority, and automatic reminders so nothing expires.
+[Permit Warden](https://permit-tracker-qaspor.vercel.app/signup) was built for contractors who work across jurisdictions: one dashboard for every permit and deadline, an AHJ directory for finding the right authority, and automatic reminders so nothing expires.
 $$, TRUE, NOW(), 'What Is an AHJ? Authority Having Jurisdiction Explained', 'AHJ explained: what Authority Having Jurisdiction means, how to find yours, and why contractors working across jurisdictions need a system.')
 ON CONFLICT (slug) DO NOTHING;

@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
-            <span className="text-xl font-bold text-gray-900 dark:text-white">Permit Tracker</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Permit Warden</span>
           </div>
           <nav className="flex-1 px-2 py-4 space-y-1">
             {nav.map((item) => (

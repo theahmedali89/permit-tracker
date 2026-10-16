@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://permit-tracker-azure.vercel.app"),
   title: {
-    default: "Permit Tracker - Never miss a permit deadline",
-    template: "%s | Permit Tracker",
+    default: "Permit Warden - Never miss a permit deadline",
+    template: "%s | Permit Warden",
   },
   description:
     "Track permits, licenses, inspections, and renewal deadlines in one simple dashboard for small U.S. contractors.",
@@ -29,20 +29,20 @@ export const metadata: Metadata = {
     "permit deadline tracking",
     "permit renewal reminders",
   ],
-  authors: [{ name: "Permit Tracker" }],
-  creator: "Permit Tracker",
+  authors: [{ name: "Permit Warden" }],
+  creator: "Permit Warden",
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
-    siteName: "Permit Tracker",
-    title: "Permit Tracker - Never miss a permit deadline",
+    siteName: "Permit Warden",
+    title: "Permit Warden - Never miss a permit deadline",
     description:
       "Permits, licenses, inspections, and renewal deadlines in one dashboard for small U.S. contractors.",
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Permit Tracker - Never miss a permit deadline",
+    title: "Permit Warden - Never miss a permit deadline",
     description:
       "Permits, licenses, inspections, and renewal deadlines in one dashboard for small U.S. contractors.",
   },

@@ -52,7 +52,7 @@ export async function POST() {
   for (const d of deadlines || []) {
     // Resolve a human-readable title
     let title = `${d.deadline_type} deadline`;
-    let description = `Permit Tracker deadline (${d.resource_type})`;
+    let description = `Permit Warden deadline (${d.resource_type})`;
     try {
       if (d.resource_type === "permit") {
         const { data: p } = await serviceClient

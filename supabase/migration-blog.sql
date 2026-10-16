@@ -1,4 +1,4 @@
--- Blog posts for the public Permit Tracker blog (/blog).
+-- Blog posts for the public Permit Warden blog (/blog).
 -- Markdown content, rendered with react-markdown.
 
 CREATE TABLE IF NOT EXISTS blog_posts (

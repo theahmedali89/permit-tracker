@@ -7,9 +7,9 @@ import { AuthLayout } from "@/components/auth-layout";
 export const metadata: Metadata = {
   title: "Sign up - Start tracking permits in minutes",
   description:
-    "Create a free Permit Tracker account. Track building permits, licenses, inspections, and renewal deadlines with automatic email reminders for U.S. contractors.",
+    "Create a free Permit Warden account. Track building permits, licenses, inspections, and renewal deadlines with automatic email reminders for U.S. contractors.",
   openGraph: {
-    title: "Permit Tracker - Start tracking permits in minutes",
+    title: "Permit Warden - Start tracking permits in minutes",
     description:
       "Free permit, license, and inspection tracking for small U.S. contractors with automatic renewal reminders.",
   },
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const SOFTWARE_JSON_LD = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Permit Tracker",
+  name: "Permit Warden",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description:

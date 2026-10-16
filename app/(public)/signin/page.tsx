@@ -6,7 +6,7 @@ import { AuthLayout } from "@/components/auth-layout";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to Permit Tracker to manage your permits, licenses, inspections, and renewal deadlines.",
+  description: "Sign in to Permit Warden to manage your permits, licenses, inspections, and renewal deadlines.",
   robots: { index: false, follow: true },
 };
 
