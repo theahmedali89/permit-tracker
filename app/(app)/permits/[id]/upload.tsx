@@ -2,11 +2,12 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui";
+import { Button, Input } from "@/components/ui";
 
 export function DocumentUpload({ permitId }: { permitId: string }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+  const [expiryDate, setExpiryDate] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,6 +21,7 @@ export function DocumentUpload({ permitId }: { permitId: string }) {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("permit_id", permitId);
+      if (expiryDate) formData.append("expiry_date", expiryDate);
 
       const res = await fetch("/api/documents", {
         method: "POST",
@@ -50,11 +52,23 @@ export function DocumentUpload({ permitId }: { permitId: string }) {
         className="hidden"
         id="doc-upload"
       />
+      <div className="mb-2 max-w-xs">
+        <label htmlFor="doc-expiry" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Expiry date (optional)
+        </label>
+        <Input
+          id="doc-expiry"
+          type="date"
+          value={expiryDate}
+          onChange={(e) => setExpiryDate(e.target.value)}
+          disabled={uploading}
+        />
+      </div>
       <Button
         onClick={() => fileRef.current?.click()}
         disabled={uploading}
       >
-        {uploading ? "Uploading..." : "📎 Upload Document"}
+        {uploading ? "Uploading..." : "Upload Document"}
       </Button>
       {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
       <p className="text-xs text-gray-500 mt-1">PDF, JPG, PNG up to 10MB</p>
