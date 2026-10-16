@@ -153,6 +153,80 @@ function timeAgo(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+/* ── Charts (pure SVG, no library) ── */
+
+function DonutChart({ segments }: { segments: { value: number; color: string; label: string }[] }) {
+  const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+  const R = 15.9155; // circumference ≈ 100
+  let acc = 0;
+  return (
+    <div className="flex items-center gap-6">
+      <svg viewBox="0 0 42 42" className="w-28 h-28 shrink-0 -rotate-90">
+        <circle cx="21" cy="21" r={R} fill="none" strokeWidth="7" className="stroke-gray-200 dark:stroke-gray-700" />
+        {segments.map((s, i) => {
+          const frac = (s.value / total) * 100;
+          const dashoffset = 25 - acc;
+          acc += frac;
+          if (frac <= 0) return null;
+          return (
+            <circle
+              key={i}
+              cx="21"
+              cy="21"
+              r={R}
+              fill="none"
+              stroke={s.color}
+              strokeWidth="7"
+              strokeDasharray={`${frac} ${100 - frac}`}
+              strokeDashoffset={dashoffset}
+            />
+          );
+        })}
+      </svg>
+      <div className="space-y-2">
+        {segments.map((s) => (
+          <div key={s.label} className="flex items-center gap-2 text-sm">
+            <span className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: s.color }} />
+            <span className="text-gray-600 dark:text-gray-400">{s.label}</span>
+            <span className="ml-auto font-semibold text-gray-900 dark:text-white pl-4">{s.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ForecastChart({ months }: { months: { label: string; permits: number; licenses: number; documents: number }[] }) {
+  const max = Math.max(1, ...months.map((m) => m.permits + m.licenses + m.documents));
+  return (
+    <div>
+      <div className="flex items-end gap-3 h-36">
+        {months.map((m) => {
+          const total = m.permits + m.licenses + m.documents;
+          return (
+            <div key={m.label} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                {total > 0 ? total : ""}
+              </span>
+              <div className="w-full max-w-10 flex flex-col-reverse rounded-t-md overflow-hidden bg-gray-100 dark:bg-gray-700/60" style={{ height: `${Math.max(4, (total / max) * 100)}%` }}>
+                {m.documents > 0 && <div className="bg-slate-400 dark:bg-slate-500" style={{ height: `${(m.documents / total) * 100}%` }} title={`${m.documents} documents`} />}
+                {m.licenses > 0 && <div className="bg-amber-400" style={{ height: `${(m.licenses / total) * 100}%` }} title={`${m.licenses} licenses`} />}
+                {m.permits > 0 && <div className="bg-blue-500" style={{ height: `${(m.permits / total) * 100}%` }} title={`${m.permits} permits`} />}
+              </div>
+              <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{m.label}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-4 flex items-center justify-center gap-5 text-xs text-gray-500 dark:text-gray-400">
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-blue-500" /> Permits</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-amber-400" /> Licenses</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-slate-400" /> Documents</span>
+      </div>
+    </div>
+  );
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -201,6 +275,31 @@ export default async function DashboardPage() {
     .eq("organization_id", orgId)
     .order("created_at", { ascending: false })
     .limit(8);
+
+  // 6-month expiry forecast (permits + licenses + documents)
+  const todayStr = new Date().toISOString().split("T")[0];
+  const sixMo = new Date();
+  sixMo.setMonth(sixMo.getMonth() + 6);
+  const sixMoStr = sixMo.toISOString().split("T")[0];
+
+  const [{ data: pExp }, { data: lExp }, { data: dExp }] = await Promise.all([
+    supabase.from("permits").select("expiration_date").eq("organization_id", orgId).gte("expiration_date", todayStr).lte("expiration_date", sixMoStr),
+    supabase.from("licenses").select("expiration_date").eq("organization_id", orgId).gte("expiration_date", todayStr).lte("expiration_date", sixMoStr),
+    supabase.from("documents").select("expiry_date").eq("organization_id", orgId).gte("expiry_date", todayStr).lte("expiry_date", sixMoStr),
+  ]);
+
+  const forecast: { label: string; permits: number; licenses: number; documents: number }[] = [];
+  for (let i = 0; i < 6; i++) {
+    const d = new Date();
+    d.setMonth(d.getMonth() + i);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    forecast.push({
+      label: d.toLocaleDateString("en-US", { month: "short" }),
+      permits: (pExp || []).filter((p: any) => p.expiration_date?.startsWith(key)).length,
+      licenses: (lExp || []).filter((l: any) => l.expiration_date?.startsWith(key)).length,
+      documents: (dExp || []).filter((x: any) => x.expiry_date?.startsWith(key)).length,
+    });
+  }
 
   const totalPermits = (activeCount || 0) + (pendingCount || 0) + (expiringCount || 0) + (expiredCount || 0);
   const atRisk = (expiringCount || 0) + (expiredCount || 0);
@@ -277,8 +376,35 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Action required */}
+      {/* Charts: status breakdown + 6-month forecast */}
+      <div className="grid lg:grid-cols-2 gap-6 mb-8">
+        <Card className="p-6">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+            Permit status
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+            Breakdown of all permits by current status.
+          </p>
+          <DonutChart
+            segments={[
+              { value: (activeCount || 0) + (pendingCount || 0), color: "#10b981", label: "Active" },
+              { value: expiringCount || 0, color: "#f59e0b", label: "Expiring soon" },
+              { value: expiredCount || 0, color: "#f43f5e", label: "Expired" },
+            ]}
+          />
+        </Card>
+        <Card className="p-6">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+            Renewal forecast
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+            Expiries due in the next 6 months.
+          </p>
+          <ForecastChart months={forecast} />
+        </Card>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">        {/* Action required */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white">
