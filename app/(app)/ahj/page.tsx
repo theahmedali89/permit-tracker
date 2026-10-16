@@ -32,6 +32,27 @@ export default async function AhjDirectoryPage({
 
   const { data: entries } = await query;
 
+  // Jurisdiction regulations (building-permit validity / extensions / processing).
+  // The table may not exist yet (Ahmed runs migrations separately) — degrade
+  // gracefully: on any failure we simply show no regulatory info.
+  let regulationsByCity: Record<string, any> = {};
+  try {
+    const { data: regs, error } = await supabase
+      .from("jurisdiction_regulations")
+      .select("*");
+    if (!error && regs) {
+      for (const r of regs as any[]) {
+        const key = `${(r.city || "").toLowerCase()}|${(r.state_code || "").toLowerCase()}`;
+        // Prefer the building-permit row if several permit types exist for a city.
+        if (!regulationsByCity[key] || r.permit_type === "building") {
+          regulationsByCity[key] = r;
+        }
+      }
+    }
+  } catch {
+    regulationsByCity = {};
+  }
+
   const { data: states } = await supabase
     .from("ahj_directory")
     .select("state")
@@ -93,7 +114,12 @@ export default async function AhjDirectoryPage({
         </Card>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
-          {entries.map((entry: any) => (
+          {entries.map((entry: any) => {
+            const reg =
+              regulationsByCity[
+                `${(entry.city || "").toLowerCase()}|${(entry.state || "").toLowerCase()}`
+              ];
+            return (
             <Card key={entry.id} className="p-5">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -128,8 +154,64 @@ export default async function AhjDirectoryPage({
                   </p>
                 )}
               </div>
+              {reg && (
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs space-y-1">
+                  <p className="font-semibold text-gray-700 dark:text-gray-300">
+                    🏛️ Building permit rules
+                  </p>
+                  {reg.validity_days != null && (
+                    <p className="text-gray-600 dark:text-gray-400">
+                      ⏳ Valid {reg.validity_days} days
+                      {reg.validity_notes ? ` — ${reg.validity_notes}` : ""}
+                    </p>
+                  )}
+                  {reg.validity_days == null && reg.validity_notes && (
+                    <p className="text-gray-600 dark:text-gray-400">
+                      ⏳ {reg.validity_notes}
+                    </p>
+                  )}
+                  {reg.processing_days != null && (
+                    <p className="text-gray-600 dark:text-gray-400">
+                      🕐 Typical plan review: {reg.processing_days} days
+                    </p>
+                  )}
+                  {reg.extension_allowed === true && (
+                    <p className="text-gray-600 dark:text-gray-400">
+                      🔁 Extensions allowed
+                      {reg.extension_fee_usd != null
+                        ? ` ($${reg.extension_fee_usd})`
+                        : ""}
+                      {reg.extension_process ? ` — ${reg.extension_process}` : ""}
+                    </p>
+                  )}
+                  {reg.extension_allowed === false && (
+                    <p className="text-gray-600 dark:text-gray-400">
+                      🔁 Extensions not allowed
+                    </p>
+                  )}
+                  {reg.source_url && (
+                    <p className="pt-1">
+                      {(reg.source_url as string)
+                        .split(/\s+/)
+                        .filter(Boolean)
+                        .map((u: string, i: number) => (
+                          <a
+                            key={i}
+                            href={u}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-500 dark:text-blue-400 mr-3"
+                          >
+                            📄 Source{i > 0 ? ` ${i + 1}` : ""} ↗
+                          </a>
+                        ))}
+                    </p>
+                  )}
+                </div>
+              )}
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
 

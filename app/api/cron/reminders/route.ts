@@ -121,19 +121,82 @@ export async function GET(request: NextRequest) {
     // ---- Renewal auto-reminders ----
     // Permits with a renewal_deadline coming up get renewal-specific emails.
     const renewalOffsets = [30, 14, 7, 1];
+
+    // ---- Smart renewal buffers ----
+    // When verified jurisdiction-level processing times exist
+    // (jurisdiction_regulations.processing_days), they REPLACE the static
+    // 30/14/7/1-day offsets for that permit with a single smart alert date:
+    //   alert_date = renewal_deadline - processing_days - 7 (safety margin)
+    // A reminder is then due every day from the alert date until expiry, so
+    // the renewal paperwork can actually clear in time. The table is created
+    // by a migration Ahmed runs manually, so it may not exist yet — any
+    // lookup failure silently falls back to the static offsets (warning
+    // logged, cron keeps running).
+    type RegulationRow = { city: string | null; state_code: string | null; processing_days: number | null };
+    let regulations: RegulationRow[] = [];
+    try {
+      const { data, error } = await supabase
+        .from("jurisdiction_regulations")
+        .select("city, state_code, processing_days")
+        .not("processing_days", "is", null);
+      if (error) throw error;
+      regulations = (data || []) as RegulationRow[];
+    } catch (err: any) {
+      console.warn(
+        "jurisdiction_regulations lookup failed; using static reminder offsets:",
+        err?.message || err
+      );
+    }
+
+    // Match a permit's free-text jurisdiction against the regulations table,
+    // case-insensitively on city + state_code. A city+state hit wins outright;
+    // a city-only hit is kept as a fallback.
+    function matchRegulation(jurisdiction: string | null | undefined): RegulationRow | null {
+      if (!jurisdiction || regulations.length === 0) return null;
+      const j = jurisdiction.toLowerCase();
+      let cityOnly: RegulationRow | null = null;
+      for (const r of regulations) {
+        const city = (r.city || "").toLowerCase().trim();
+        if (!city || !j.includes(city)) continue;
+        const state = (r.state_code || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (state && new RegExp(`\\b${state}\\b`).test(j)) return r;
+        if (!cityOnly) cityOnly = r;
+      }
+      return cityOnly;
+    }
+
+    // Widen the lookahead so slow jurisdictions enter the query window early
+    // enough for their smart alert date to fire (e.g. 45-day processing needs
+    // a 52-day window). With no regulation data, the static 30-day window
+    // is kept unchanged.
+    const maxProcessing = regulations.reduce((m, r) => Math.max(m, r.processing_days || 0), 0);
     const maxRenewalDate = new Date();
-    maxRenewalDate.setDate(maxRenewalDate.getDate() + 30);
+    maxRenewalDate.setDate(maxRenewalDate.getDate() + Math.max(30, maxProcessing + 7));
 
     const { data: renewalPermits } = await supabase
       .from("permits")
-      .select("id, organization_id, permit_type, permit_number, renewal_deadline, organizations!inner(name)")
+      .select("id, organization_id, permit_type, permit_number, renewal_deadline, jurisdiction, organizations!inner(name)")
       .gte("renewal_deadline", today)
       .lte("renewal_deadline", maxRenewalDate.toISOString().split("T")[0])
       .not("status", "in", "(closed,cancelled)");
 
     for (const permit of renewalPermits || []) {
       const remaining = daysUntil(permit.renewal_deadline);
-      if (!renewalOffsets.includes(remaining)) continue;
+
+      // Smart buffer replaces the static offsets when the permit's
+      // jurisdiction has a known processing time; otherwise the existing
+      // 30/14/7/1-day logic runs unchanged.
+      const reg = matchRegulation(permit.jurisdiction);
+      const processingDays = reg?.processing_days ?? null;
+      let smartReminder = false;
+      if (processingDays != null) {
+        const alertDate = new Date(permit.renewal_deadline);
+        alertDate.setDate(alertDate.getDate() - processingDays - 7);
+        smartReminder = today >= alertDate.toISOString().split("T")[0] && remaining > 0;
+        if (!smartReminder) continue;
+      } else if (!renewalOffsets.includes(remaining)) {
+        continue;
+      }
 
       // Ensure a pending 'renewal' deadline row exists for idempotency
       let deadlineId: string | null = null;
@@ -179,13 +242,17 @@ export async function GET(request: NextRequest) {
       try {
         await sendReminder({
           to: "placeholder@example.com", // TODO: Get actual user emails
-          subject: `🔄 Permit renewal due in ${remaining} days: ${permit.permit_type}`,
+          subject: smartReminder
+            ? `🔄 Start permit renewal now (${reg?.city || "your jurisdiction"}): ${permit.permit_type}`
+            : `🔄 Permit renewal due in ${remaining} days: ${permit.permit_type}`,
           html: `
             <h2>Permit Renewal Reminder</h2>
             <p><strong>Company:</strong> ${(permit as any).organizations.name}</p>
             <p><strong>Permit:</strong> ${permit.permit_type} ${permit.permit_number || ""}</p>
             <p><strong>Renewal Deadline:</strong> ${permit.renewal_deadline}</p>
-            <p><strong>Days Remaining:</strong> ${remaining}</p>
+            ${smartReminder
+              ? `<p><strong>Why now:</strong> renewals in ${reg?.city || "this jurisdiction"} typically take ${processingDays} days to process — starting today keeps you covered.</p>`
+              : `<p><strong>Days Remaining:</strong> ${remaining}</p>`}
             <p>Start the renewal paperwork now to avoid a lapse in coverage.</p>
             <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/permits/${permit.id}">View permit</a></p>
           `,

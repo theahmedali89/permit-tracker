@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Card, Button, Input, Alert } from "@/components/ui";
 import CustomFieldsInput from "@/components/custom-fields-input";
+import PermitOcrUpload, { type OcrPrefill } from "@/components/permit-ocr-upload";
 
 export default function NewPermitPage() {
   const router = useRouter();
@@ -12,6 +13,15 @@ export default function NewPermitPage() {
   const [error, setError] = useState("");
   const [projects, setProjects] = useState<any[]>([]);
   const [customFields, setCustomFields] = useState<Record<string, string>>({});
+  // Pre-fill targets for the document scanner below; stay fully editable.
+  const [permitNumber, setPermitNumber] = useState("");
+  const [expirationDate, setExpirationDate] = useState("");
+
+  /** Apply values chosen from the OCR scan into the form (still editable). */
+  function handleOcrExtract(v: OcrPrefill) {
+    if (v.permit_number !== undefined) setPermitNumber(v.permit_number);
+    if (v.expiration_date !== undefined) setExpirationDate(v.expiration_date);
+  }
 
   useEffect(() => {
     fetch("/api/projects").then(r => r.json()).then(setProjects);
@@ -52,6 +62,7 @@ export default function NewPermitPage() {
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add Permit</h1>
       <Card className="p-6 max-w-2xl">
         {error && <Alert type="error"><p>{error}</p></Alert>}
+        <PermitOcrUpload onExtract={handleOcrExtract} />
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -78,7 +89,12 @@ export default function NewPermitPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Permit Number
               </label>
-              <Input name="permit_number" placeholder="2026-001234" />
+              <Input
+                name="permit_number"
+                placeholder="2026-001234"
+                value={permitNumber}
+                onChange={(e) => setPermitNumber(e.target.value)}
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -106,7 +122,12 @@ export default function NewPermitPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Expiration Date
               </label>
-              <Input name="expiration_date" type="date" />
+              <Input
+                name="expiration_date"
+                type="date"
+                value={expirationDate}
+                onChange={(e) => setExpirationDate(e.target.value)}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
