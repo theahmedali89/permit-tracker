@@ -26,14 +26,32 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return { title: "Not found" };
+  const url = `https://permitwarden.com/blog/${slug}`;
   return {
     title: post.meta_title || post.title,
     description: post.meta_description || post.excerpt,
+    alternates: { canonical: url },
     openGraph: {
       type: "article",
       title: post.meta_title || post.title,
       description: post.meta_description || post.excerpt,
       publishedTime: post.published_at || undefined,
+      modifiedTime: post.updated_at || undefined,
+      url,
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.meta_title || post.title,
+      description: post.meta_description || post.excerpt,
+      images: ["/og-image.png"],
     },
   };
 }
@@ -47,14 +65,31 @@ export default async function BlogPostPage({
   const post = await getPost(slug);
   if (!post) notFound();
 
+  const url = `https://permitwarden.com/blog/${slug}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
     description: post.excerpt,
     datePublished: post.published_at,
-    author: { "@type": "Organization", name: "Permit Warden" },
-    publisher: { "@type": "Organization", name: "Permit Warden" },
+    dateModified: post.updated_at || post.published_at,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    author: { "@type": "Organization", name: "Permit Warden", url: "https://permitwarden.com" },
+    publisher: {
+      "@type": "Organization",
+      name: "Permit Warden",
+      logo: { "@type": "ImageObject", url: "https://permitwarden.com/logo.png" },
+    },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://permitwarden.com" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://permitwarden.com/blog" },
+      { "@type": "ListItem", position: 3, name: post.title, item: url },
+    ],
   };
 
   return (
@@ -62,6 +97,10 @@ export default async function BlogPostPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
         <Link

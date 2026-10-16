@@ -8,10 +8,20 @@ export const metadata: Metadata = {
   title: "Sign up - Start tracking permits in minutes",
   description:
     "Create a free Permit Warden account. Track building permits, licenses, inspections, and renewal deadlines with automatic email reminders for U.S. contractors.",
+  alternates: { canonical: "https://permitwarden.com/signup" },
   openGraph: {
     title: "Permit Warden - Start tracking permits in minutes",
     description:
       "Free permit, license, and inspection tracking for small U.S. contractors with automatic renewal reminders.",
+    url: "https://permitwarden.com/signup",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Permit Warden - Never miss a permit deadline",
+      },
+    ],
   },
 };
 
@@ -23,7 +33,7 @@ const SOFTWARE_JSON_LD = {
   operatingSystem: "Web",
   description:
     "Permit, license, and inspection deadline tracking with automatic renewal reminders for small U.S. contractors.",
-  url: "https://permit-tracker-azure.vercel.app/signup",
+  url: "https://permitwarden.com/signup",
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
 };
 

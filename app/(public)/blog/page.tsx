@@ -6,10 +6,20 @@ export const metadata: Metadata = {
   title: "Blog - Permit guides & compliance tips",
   description:
     "Practical guides on building permits, licenses, inspections, and renewals for U.S. contractors — plus product updates from Permit Warden.",
+  alternates: { canonical: "https://permitwarden.com/blog" },
   openGraph: {
     title: "Permit Warden Blog - Permit guides & compliance tips",
     description:
       "Practical guides on building permits, licenses, inspections, and renewals for U.S. contractors.",
+    url: "https://permitwarden.com/blog",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Permit Warden Blog - Permit guides & compliance tips",
+      },
+    ],
   },
 };
 

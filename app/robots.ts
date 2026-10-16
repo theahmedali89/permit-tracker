@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = "https://permit-tracker-azure.vercel.app";
+const SITE_URL = "https://permitwarden.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {

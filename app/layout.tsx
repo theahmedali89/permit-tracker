@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://permit-tracker-azure.vercel.app"),
+  metadataBase: new URL("https://permitwarden.com"),
   title: {
     default: "Permit Warden - Never miss a permit deadline",
     template: "%s | Permit Warden",
@@ -39,12 +39,21 @@ export const metadata: Metadata = {
     description:
       "Permits, licenses, inspections, and renewal deadlines in one dashboard for small U.S. contractors.",
     url: "/",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Permit Warden - Never miss a permit deadline",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Permit Warden - Never miss a permit deadline",
     description:
       "Permits, licenses, inspections, and renewal deadlines in one dashboard for small U.S. contractors.",
+    images: ["/og-image.png"],
   },
   manifest: "/manifest.json",
   themeColor: "#2563eb",
@@ -55,6 +64,15 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const orgLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Permit Warden",
+    url: "https://permitwarden.com",
+    logo: "https://permitwarden.com/logo.png",
+    description:
+      "Permit, license, and inspection deadline tracking with automatic renewal reminders for small U.S. contractors.",
+  };
   return (
     <html
       lang="en"
@@ -62,6 +80,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }}
+        />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
