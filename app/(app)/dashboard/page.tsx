@@ -252,29 +252,29 @@ export default async function DashboardPage() {
       supabase.from("permits").select("*", { count: "exact", head: true }).eq("organization_id", orgId).eq("status", "expired"),
     ]);
 
-  const { data: actionItems } = await supabase
-    .from("permits")
-    .select("id, permit_type, permit_number, expiration_date, status, projects(name)")
-    .eq("organization_id", orgId)
-    .in("status", ["expired", "expiring_soon"])
-    .order("expiration_date", { ascending: true })
-    .limit(8);
-
-  const { data: upcoming } = await supabase
-    .from("deadlines")
-    .select("id, deadline_type, resource_type, due_date, status")
-    .eq("organization_id", orgId)
-    .eq("status", "pending")
-    .gte("due_date", new Date().toISOString().split("T")[0])
-    .order("due_date", { ascending: true })
-    .limit(8);
-
-  const { data: recentActivity } = await supabase
-    .from("audit_events")
-    .select("id, action, entity_type, created_at")
-    .eq("organization_id", orgId)
-    .order("created_at", { ascending: false })
-    .limit(8);
+  const [{ data: actionItems }, { data: upcoming }, { data: recentActivity }] = await Promise.all([
+    supabase
+      .from("permits")
+      .select("id, permit_type, permit_number, expiration_date, status, projects(name)")
+      .eq("organization_id", orgId)
+      .in("status", ["expired", "expiring_soon"])
+      .order("expiration_date", { ascending: true })
+      .limit(8),
+    supabase
+      .from("deadlines")
+      .select("id, deadline_type, resource_type, due_date, status")
+      .eq("organization_id", orgId)
+      .eq("status", "pending")
+      .gte("due_date", new Date().toISOString().split("T")[0])
+      .order("due_date", { ascending: true })
+      .limit(8),
+    supabase
+      .from("audit_events")
+      .select("id, action, entity_type, created_at")
+      .eq("organization_id", orgId)
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
 
   // 6-month expiry forecast (permits + licenses + documents)
   const todayStr = new Date().toISOString().split("T")[0];
