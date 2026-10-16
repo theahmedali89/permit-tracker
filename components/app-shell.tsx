@@ -36,8 +36,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
             <Link href="/dashboard" className="rounded-lg px-2.5 py-2 bg-white dark:bg-transparent shadow-sm dark:shadow-none hover:shadow transition-shadow">
-              <img src="/logo.png" alt="Permit Warden" className="h-11 w-auto dark:hidden" />
-              <img src="/logo-dark.png" alt="Permit Warden" className="h-11 w-auto hidden dark:block" />
+              <img src="/logo.png" alt="Permit Warden" className="h-12 w-auto dark:hidden" />
+              <img src="/logo-dark.png" alt="Permit Warden" className="h-12 w-auto hidden dark:block" />
             </Link>
           </div>
           <nav className="flex-1 px-2 py-4 space-y-1">
