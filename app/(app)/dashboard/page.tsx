@@ -22,6 +22,9 @@ const ICONS = {
   check: "M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
   doc: "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z",
   arrow: "M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3",
+  plus: "M12 4.5v15m7.5-7.5h-15",
+  user: "M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z",
+  briefcase: "M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.114 48.114 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0",
 };
 
 function StatCard({
@@ -90,6 +93,66 @@ function deadlineLabel(d: { deadline_type: string; resource_type: string }) {
   return `${typeLabels[d.deadline_type] ?? d.deadline_type} · ${resourceLabels[d.resource_type] ?? d.resource_type}`;
 }
 
+/* ── Quick actions ── */
+
+const QUICK_ACTIONS = [
+  { label: "New permit", hint: "Track a new permit", href: "/permits/new", icon: "doc", tone: "info" },
+  { label: "Schedule inspection", hint: "Book an inspection", href: "/inspections/new", icon: "calendar", tone: "success" },
+  { label: "Add license", hint: "Track a new license", href: "/licenses/new", icon: "shield", tone: "warning" },
+  { label: "Add subcontractor", hint: "Onboard a sub", href: "/subcontractors/new", icon: "user", tone: "neutral" },
+] as const;
+
+const QA_TONES: Record<string, string> = {
+  neutral: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
+  success: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
+  warning: "bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
+  info: "bg-sky-50 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400",
+};
+
+/* ── Recent activity ── */
+
+const ACTIVITY_LABELS: Record<string, string> = {
+  "project.created": "Project created",
+  "project.updated": "Project updated",
+  "permit.created": "Permit added",
+  "permit.updated": "Permit updated",
+  "permits.csv_imported": "Permits imported from CSV",
+  "license.created": "License added",
+  "license.updated": "License updated",
+  "inspection.created": "Inspection scheduled",
+  "document.uploaded": "Document uploaded",
+  "subcontractor.created": "Subcontractor added",
+  "subcontractor_document.uploaded": "Subcontractor document uploaded",
+  "subcontractor_document.deleted": "Subcontractor document deleted",
+  "subcontractor_invite.sent": "Subcontractor invite sent",
+  "organization.updated": "Company settings updated",
+  "google_calendar.connected": "Google Calendar connected",
+  "google_calendar.synced": "Calendar synced",
+};
+
+const ACTIVITY_ICONS: Record<string, string> = {
+  project: "briefcase",
+  permit: "doc",
+  license: "shield",
+  inspection: "check",
+  document: "doc",
+  subcontractor: "user",
+  organization: "briefcase",
+  google_calendar: "calendar",
+};
+
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -130,6 +193,13 @@ export default async function DashboardPage() {
     .eq("status", "pending")
     .gte("due_date", new Date().toISOString().split("T")[0])
     .order("due_date", { ascending: true })
+    .limit(8);
+
+  const { data: recentActivity } = await supabase
+    .from("audit_events")
+    .select("id, action, entity_type, created_at")
+    .eq("organization_id", orgId)
+    .order("created_at", { ascending: false })
     .limit(8);
 
   const totalPermits = (activeCount || 0) + (pendingCount || 0) + (expiringCount || 0) + (expiredCount || 0);
@@ -177,6 +247,34 @@ export default async function DashboardPage() {
         <StatCard label="Expiring soon" value={expiringCount || 0} icon={ICONS.clock} tone="warning" />
         <StatCard label="Expired" value={expiredCount || 0} icon={ICONS.alert} tone="danger" />
         <StatCard label="Upcoming deadlines" value={upcoming?.length || 0} icon={ICONS.calendar} tone="info" />
+      </div>
+
+      {/* Quick actions */}
+      <div className="mb-8">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
+          Quick actions
+        </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {QUICK_ACTIONS.map((qa) => (
+            <Link
+              key={qa.href}
+              href={qa.href}
+              className="group flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all"
+            >
+              <span className={`shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-lg ${QA_TONES[qa.tone]}`}>
+                <Icon path={ICONS[qa.icon as keyof typeof ICONS]} className="w-5 h-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-gray-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400">
+                  {qa.label}
+                </span>
+                <span className="block text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {qa.hint}
+                </span>
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -292,6 +390,41 @@ export default async function DashboardPage() {
               })}
             </Card>
           )}
+
+          {/* Recent activity */}
+          <div className="mt-6">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
+              Recent activity
+            </h2>
+            {!recentActivity || recentActivity.length === 0 ? (
+              <Card className="p-6 text-center">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No activity yet. Add a permit or project to get started.
+                </p>
+              </Card>
+            ) : (
+              <Card className="divide-y divide-gray-100 dark:divide-gray-700/60">
+                {recentActivity.map((e: any) => (
+                  <div key={e.id} className="flex items-center gap-3 p-3.5">
+                    <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                      <Icon
+                        path={ICONS[(ACTIVITY_ICONS[e.entity_type] || "doc") as keyof typeof ICONS]}
+                        className="w-4 h-4"
+                      />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {ACTIVITY_LABELS[e.action] || e.action}
+                      </p>
+                    </div>
+                    <p className="shrink-0 text-xs text-gray-500 dark:text-gray-400">
+                      {timeAgo(e.created_at)}
+                    </p>
+                  </div>
+                ))}
+              </Card>
+            )}
+          </div>
 
           {/* Documents expiring note */}
           <Card className="mt-6 p-4">
