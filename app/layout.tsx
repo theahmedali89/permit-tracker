@@ -48,6 +48,10 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   themeColor: "#2563eb",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
