@@ -17,9 +17,9 @@ const HIGHLIGHTS = [
 
 function Logo() {
   return (
-    <div className="inline-block rounded-xl bg-white px-3 py-2 shadow-sm">
-      <img src="/logo.png" alt="Permit Warden" className="h-8 w-auto" />
-    </div>
+    <Link href="/blog" className="inline-block rounded-xl bg-white px-3.5 py-2.5 shadow-sm hover:shadow transition-shadow">
+      <img src="/logo.png" alt="Permit Warden" className="h-10 w-auto" />
+    </Link>
   );
 }
 
