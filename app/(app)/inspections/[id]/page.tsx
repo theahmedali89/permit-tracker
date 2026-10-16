@@ -4,6 +4,7 @@ import { AppShell } from "@/components/app-shell";
 import { Card, Badge } from "@/components/ui";
 import Link from "next/link";
 import { InspectionActions } from "./actions";
+import { InspectionEditButton } from "./inspection-edit";
 
 export default async function InspectionDetailPage({
   params,
@@ -41,7 +42,10 @@ export default async function InspectionDetailPage({
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Details</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Details</h2>
+            <InspectionEditButton inspection={inspection} />
+          </div>
           <dl className="space-y-3">
             <div className="flex justify-between">
               <dt className="text-sm text-gray-600 dark:text-gray-400">Status</dt>

@@ -80,3 +80,64 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(data, { status: 201 });
 }
+
+export async function PATCH(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const orgId = await getOrgId(supabase, user.id);
+  if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
+
+  const body = await request.json();
+  const { id, ...updates } = body;
+  if (!id) return NextResponse.json({ error: "License ID required" }, { status: 400 });
+
+  const { data: existing } = await supabase
+    .from("licenses")
+    .select("id, expiration_date, renewal_date")
+    .eq("id", id)
+    .eq("organization_id", orgId)
+    .single();
+  if (!existing) return NextResponse.json({ error: "License not found" }, { status: 404 });
+
+  const allowed = [
+    "license_name", "license_number", "issuing_authority", "state",
+    "issue_date", "expiration_date", "renewal_date", "notes",
+  ];
+  const filtered: Record<string, any> = {};
+  for (const f of allowed) {
+    if (updates[f] !== undefined) filtered[f] = updates[f] || null;
+  }
+
+  if (filtered.license_name !== undefined && !filtered.license_name) {
+    return NextResponse.json({ error: "License name is required" }, { status: 400 });
+  }
+
+  // Recalculate status when dates change
+  if (filtered.expiration_date !== undefined || filtered.renewal_date !== undefined) {
+    const exp = filtered.expiration_date !== undefined ? filtered.expiration_date : existing.expiration_date;
+    const ren = filtered.renewal_date !== undefined ? filtered.renewal_date : existing.renewal_date;
+    filtered.status = calculatePermitStatus(exp, ren);
+  }
+
+  const { data, error } = await supabase
+    .from("licenses")
+    .update(filtered)
+    .eq("id", id)
+    .eq("organization_id", orgId)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  await supabase.from("audit_events").insert({
+    organization_id: orgId,
+    actor_id: user.id,
+    action: "license.updated",
+    entity_type: "license",
+    entity_id: id,
+  });
+
+  return NextResponse.json(data);
+}

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Card, Badge, Button } from "@/components/ui";
 import Link from "next/link";
+import { LicenseEditButton } from "./license-edit-button";
 
 const statusColors: Record<string, "green" | "yellow" | "red" | "gray" | "blue"> = {
   active: "green",
@@ -75,9 +76,12 @@ export default async function LicensesPage() {
                     </p>
                   )}
                 </div>
-                <Badge color={statusColors[license.status] || "gray"}>
-                  {license.status.replace("_", " ")}
-                </Badge>
+                <div className="flex items-start gap-3">
+                  <Badge color={statusColors[license.status] || "gray"}>
+                    {license.status.replace("_", " ")}
+                  </Badge>
+                  <LicenseEditButton license={license} />
+                </div>
               </div>
             </Card>
           ))}

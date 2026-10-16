@@ -5,6 +5,7 @@ import { Card, Badge } from "@/components/ui";
 import { complianceStatus } from "@/lib/subcontractor-compliance";
 import Link from "next/link";
 import { DocumentUploadForm, DeleteDocButton, InviteForm } from "./components";
+import { SubcontractorEditButton } from "./subcontractor-edit";
 
 function docTypeBadge(docType: string) {
   if (docType === "license") return <Badge color="blue">License</Badge>;
@@ -68,7 +69,10 @@ export default async function SubcontractorDetailPage({
               <p className="text-gray-600 dark:text-gray-400 mt-1">{sub.trade}</p>
             )}
           </div>
-          <Badge color={comp.color}>{comp.label}</Badge>
+          <div className="flex items-center gap-3">
+            <SubcontractorEditButton sub={sub} />
+            <Badge color={comp.color}>{comp.label}</Badge>
+          </div>
         </div>
       </div>
 
