@@ -30,12 +30,20 @@ export default function BlogAdminPage() {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [loadError, setLoadError] = useState("");
 
   async function load() {
-    const res = await fetch("/api/blog");
-    if (res.ok) {
+    setLoadError("");
+    try {
+      const res = await fetch("/api/blog");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Failed to load (HTTP ${res.status})`);
+      }
       const { posts } = await res.json();
-      setPosts(posts);
+      setPosts(posts || []);
+    } catch (err: any) {
+      setLoadError(err.message);
     }
   }
 
@@ -182,7 +190,12 @@ export default function BlogAdminPage() {
       )}
 
       <Card className="divide-y divide-gray-100 dark:divide-gray-700/60">
-        {posts.length === 0 && (
+        {loadError && (
+          <p className="p-6 text-sm text-red-600 dark:text-red-400">
+            Couldn't load posts: {loadError}
+          </p>
+        )}
+        {!loadError && posts.length === 0 && (
           <p className="p-6 text-sm text-gray-500 dark:text-gray-400 text-center">
             No posts yet.
           </p>

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://permit-tracker-qaspor.vercel.app"),
+  metadataBase: new URL("https://permit-tracker-azure.vercel.app"),
   title: {
     default: "Permit Tracker - Never miss a permit deadline",
     template: "%s | Permit Tracker",
