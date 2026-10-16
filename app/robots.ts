@@ -1,0 +1,30 @@
+import type { MetadataRoute } from "next";
+
+const SITE_URL = "https://permit-tracker-qaspor.vercel.app";
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: [
+      {
+        userAgent: "*",
+        allow: ["/signin", "/signup"],
+        disallow: [
+          "/dashboard",
+          "/projects",
+          "/permits",
+          "/licenses",
+          "/inspections",
+          "/ahj",
+          "/subcontractors",
+          "/reports",
+          "/calendar",
+          "/settings",
+          "/onboarding",
+          "/portal/",
+          "/api/",
+        ],
+      },
+    ],
+    sitemap: `${SITE_URL}/sitemap.xml`,
+  };
+}

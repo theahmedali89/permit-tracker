@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Sign in",
+  description: "Sign in to Permit Tracker to manage your permits, licenses, inspections, and renewal deadlines.",
+  robots: { index: false, follow: true },
+};
 
 export default async function SignInPage({
   searchParams,

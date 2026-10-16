@@ -14,8 +14,38 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Permit Tracker - Never miss a permit deadline",
-  description: "Track permits, licenses, inspections, and renewal deadlines in one simple dashboard for small U.S. contractors.",
+  metadataBase: new URL("https://permit-tracker-qaspor.vercel.app"),
+  title: {
+    default: "Permit Tracker - Never miss a permit deadline",
+    template: "%s | Permit Tracker",
+  },
+  description:
+    "Track permits, licenses, inspections, and renewal deadlines in one simple dashboard for small U.S. contractors.",
+  keywords: [
+    "permit tracker app",
+    "construction permit management software",
+    "building permit tracking software",
+    "contractor permit tracking",
+    "permit deadline tracking",
+    "permit renewal reminders",
+  ],
+  authors: [{ name: "Permit Tracker" }],
+  creator: "Permit Tracker",
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: "Permit Tracker",
+    title: "Permit Tracker - Never miss a permit deadline",
+    description:
+      "Permits, licenses, inspections, and renewal deadlines in one dashboard for small U.S. contractors.",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Permit Tracker - Never miss a permit deadline",
+    description:
+      "Permits, licenses, inspections, and renewal deadlines in one dashboard for small U.S. contractors.",
+  },
   manifest: "/manifest.json",
   themeColor: "#2563eb",
 };

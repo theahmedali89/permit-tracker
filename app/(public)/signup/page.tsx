@@ -1,5 +1,29 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Sign up - Start tracking permits in minutes",
+  description:
+    "Create a free Permit Tracker account. Track building permits, licenses, inspections, and renewal deadlines with automatic email reminders for U.S. contractors.",
+  openGraph: {
+    title: "Permit Tracker - Start tracking permits in minutes",
+    description:
+      "Free permit, license, and inspection tracking for small U.S. contractors with automatic renewal reminders.",
+  },
+};
+
+const SOFTWARE_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Permit Tracker",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  description:
+    "Permit, license, and inspection deadline tracking with automatic renewal reminders for small U.S. contractors.",
+  url: "https://permit-tracker-qaspor.vercel.app/signup",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+};
 
 export default async function SignUpPage({
   searchParams,
@@ -14,6 +38,11 @@ export default async function SignUpPage({
   const error = params.error;
 
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SOFTWARE_JSON_LD) }}
+      />
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="max-w-md w-full space-y-8">
         <div>
@@ -71,5 +100,6 @@ export default async function SignUpPage({
         </form>
       </div>
     </div>
+    </>
   );
 }
