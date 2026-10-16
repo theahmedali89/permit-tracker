@@ -70,6 +70,21 @@ export default async function SettingsPage() {
 
         <Card className="p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Blog
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            Write and publish articles for the public blog at /blog.
+          </p>
+          <Link
+            href="/settings/blog"
+            className="inline-block px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+          >
+            Manage Blog
+          </Link>
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Appearance
           </h2>
           <ThemeSettings />
