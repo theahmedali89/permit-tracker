@@ -2,15 +2,39 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createBuildClient } from "@/lib/supabase/build";
 import { STATE_NAMES, stateSlug, stateCodeFromSlug, citySlug, type AhjEntry } from "../../_lib";
+import { getRegulation, type RegulationData } from "../../_regulations";
+
+/** True when the regulation row has at least one substantive field worth showing. */
+function hasRegulationContent(reg: RegulationData): boolean {
+  return (
+    reg.validity_days !== undefined ||
+    reg.validity_notes !== undefined ||
+    reg.extension_allowed !== undefined ||
+    reg.extension_process !== undefined ||
+    reg.extension_fee_usd !== undefined ||
+    reg.processing_days !== undefined ||
+    reg.source_url !== undefined
+  );
+}
 
 export async function generateStaticParams() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("ahj_directory").select("state, city");
-  return ((data as { state: string; city: string | null }[] | null) || []).map((r) => ({
-    state: stateSlug(r.state),
-    city: citySlug(r.city),
-  }));
+  // Build-time only: no cookies available. If the DB is unreachable (e.g. no
+  // env vars in a local build), return [] so pages render on demand instead of
+  // failing the whole build.
+  try {
+    const supabase = createBuildClient();
+    const { data, error } = await supabase.from("ahj_directory").select("state, city");
+    if (error) throw error;
+    return ((data as { state: string; city: string | null }[] | null) || []).map((r) => ({
+      state: stateSlug(r.state),
+      city: citySlug(r.city),
+    }));
+  } catch {
+    console.warn("[ahj] generateStaticParams: DB unavailable, skipping static generation");
+    return [];
+  }
 }
 
 async function getEntry(stateSlugParam: string, citySlugParam: string) {
@@ -40,13 +64,18 @@ export async function generateMetadata({
   const { name, entry } = data;
   const place = entry.city || entry.county || name;
   const url = `https://permitwarden.com/ahj/${state}/${city}`;
+  const reg = getRegulation(data.code, entry.city);
+  const validityBit =
+    reg && reg.validity_days !== undefined
+      ? ` Building permits typically valid ${reg.validity_days} days.`
+      : "";
   return {
     title: `${place} permit portal — ${entry.authority_name} | Permit Warden`,
-    description: `Official permit portal for ${place}, ${name}: ${entry.authority_name}. Direct portal link${entry.phone ? `, phone ${entry.phone}` : ""}.`,
+    description: `Official permit portal for ${place}, ${name}: ${entry.authority_name}.${validityBit} Direct portal link${entry.phone ? `, phone ${entry.phone}` : ""}.`,
     alternates: { canonical: url },
     openGraph: {
       title: `${place} permit portal`,
-      description: `Official portal: ${entry.authority_name}.`,
+      description: `Official portal: ${entry.authority_name}.${validityBit}`,
       url,
     },
   };
@@ -62,6 +91,8 @@ export default async function JurisdictionPage({
   if (!data) notFound();
   const { name, entry, siblings } = data;
   const place = entry.city || entry.county || name;
+  const reg = getRegulation(data.code, entry.city);
+  const showReg = reg !== undefined && hasRegulationContent(reg);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -78,12 +109,67 @@ export default async function JurisdictionPage({
     description: entry.notes || `Building permit authority for ${place}, ${name}.`,
   };
 
+  // FAQ entries derived strictly from the regulatory data (no invented answers).
+  const faqQuestions: { name: string; text: string }[] = [];
+  if (showReg && reg) {
+    if (reg.validity_days !== undefined) {
+      let answer = `Building permits in ${place} are valid for ${reg.validity_days} days (${reg.permit_type} permits).`;
+      if (reg.validity_notes) answer += ` ${reg.validity_notes}`;
+      faqQuestions.push({
+        name: `How long is a building permit valid in ${place}?`,
+        text: answer,
+      });
+    }
+    if (reg.extension_allowed !== undefined || reg.extension_process || reg.extension_fee_usd !== undefined) {
+      let answer: string;
+      if (reg.extension_allowed === true) {
+        answer = `Yes — permit extensions are allowed in ${place}.`;
+        if (reg.extension_fee_usd !== undefined) answer += ` The renewal fee is $${reg.extension_fee_usd}.`;
+        if (reg.extension_process) answer += ` ${reg.extension_process}`;
+      } else if (reg.extension_allowed === false) {
+        answer = `Extensions are not allowed in ${place} under the rules we have verified.`;
+        if (reg.extension_process) answer += ` ${reg.extension_process}`;
+      } else {
+        answer = `Extension policy for ${place}: ${reg.extension_process ?? ""}`;
+      }
+      faqQuestions.push({
+        name: `Can I extend or renew a building permit in ${place}?`,
+        text: answer.trim(),
+      });
+    }
+    if (reg.processing_days !== undefined) {
+      faqQuestions.push({
+        name: `How long does it take to get a building permit in ${place}?`,
+        text: `Reported processing time in ${place} is about ${reg.processing_days} days. Actual times vary by project type and application completeness.`,
+      });
+    }
+  }
+
+  const faqJsonLd =
+    faqQuestions.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqQuestions.map((q) => ({
+            "@type": "Question",
+            name: q.name,
+            acceptedAnswer: { "@type": "Answer", text: q.text },
+          })),
+        }
+      : null;
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
           <nav className="text-sm text-gray-500 dark:text-gray-400" aria-label="Breadcrumb">
@@ -164,6 +250,79 @@ export default async function JurisdictionPage({
               )}
             </dl>
           </div>
+
+          {showReg && reg && (
+            <div className="mt-8 rounded-lg border border-emerald-200 bg-white p-6 dark:border-emerald-800 dark:bg-gray-800">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Permit validity &amp; renewal — {place}
+              </h2>
+              <dl className="mt-4 space-y-4">
+                {reg.validity_days !== undefined && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Validity period
+                    </dt>
+                    <dd className="mt-1 text-gray-900 dark:text-white">
+                      {reg.validity_days} days ({reg.permit_type} permits)
+                    </dd>
+                    {reg.validity_notes && (
+                      <dd className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                        {reg.validity_notes}
+                      </dd>
+                    )}
+                  </div>
+                )}
+                {(reg.extension_allowed !== undefined || reg.extension_process || reg.extension_fee_usd !== undefined) && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Extension / renewal
+                    </dt>
+                    <dd className="mt-1 text-gray-900 dark:text-white">
+                      {reg.extension_allowed === true
+                        ? "Allowed"
+                        : reg.extension_allowed === false
+                          ? "Not allowed"
+                          : "Policy on file"}
+                      {reg.extension_fee_usd !== undefined &&
+                        ` — $${reg.extension_fee_usd} fee`}
+                    </dd>
+                    {reg.extension_process && (
+                      <dd className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                        {reg.extension_process}
+                      </dd>
+                    )}
+                  </div>
+                )}
+                {reg.processing_days !== undefined && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Typical processing time
+                    </dt>
+                    <dd className="mt-1 text-gray-900 dark:text-white">
+                      About {reg.processing_days} days
+                    </dd>
+                  </div>
+                )}
+                {reg.source_url && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Source
+                    </dt>
+                    <dd className="mt-1 text-sm">
+                      <a
+                        href={reg.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="break-all text-sky-600 hover:text-sky-700 dark:text-sky-400"
+                      >
+                        Official source ↗
+                      </a>
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+          )}
 
           {siblings.length > 0 && (
             <div className="mt-10">

@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
           "/permits",
           "/licenses",
           "/inspections",
-          "/ahj",
+          "/directory",
           "/subcontractors",
           "/reports",
           "/calendar",

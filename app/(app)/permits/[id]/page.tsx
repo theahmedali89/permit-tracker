@@ -105,7 +105,7 @@ export default async function PermitDetailPage({
               <div className="flex justify-between items-center">
                 <dt className="text-sm text-gray-600 dark:text-gray-400">Renewal</dt>
                 <dd>
-                  <Link href="/ahj" className="text-sm text-blue-600 hover:text-blue-500">
+                  <Link href="/directory" className="text-sm text-blue-600 hover:text-blue-500">
                     Find AHJ portal →
                   </Link>
                 </dd>
