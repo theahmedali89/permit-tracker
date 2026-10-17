@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import FineStats from "../../_components/FineStats";
 
 const PAGE_URL = "https://permitwarden.com/compare/permitwarden-vs-excel";
 
@@ -86,10 +87,11 @@ export default function ComparePage() {
             business.
           </p>
 
+          <FineStats />
+
           <h2 className="mt-12 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
             Where spreadsheets fall short
-          </h2>
-          <div className="mt-6 space-y-6">
+          </h2>          <div className="mt-6 space-y-6">
             {SPREADSHEET_PAINS.map(([title, body]) => (
               <div key={title} className="flex gap-3">
                 <XIcon />

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import FineStats from "../_components/FineStats";
 
 export interface SolutionContent {
   slug: string;
@@ -95,10 +96,11 @@ export function SolutionPage({ content }: { content: SolutionContent }) {
             ))}
           </div>
 
+          <FineStats />
+
           <h2 className="mt-12 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
             How Permit Warden helps
-          </h2>
-          <div className="mt-6 space-y-5">
+          </h2>          <div className="mt-6 space-y-5">
             {content.features.map(([title, body]) => (
               <div key={title} className="flex gap-3">
                 <CheckIcon />
