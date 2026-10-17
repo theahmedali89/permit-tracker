@@ -189,3 +189,34 @@ export async function PATCH(request: NextRequest) {
 
   return NextResponse.json(data);
 }
+
+export async function DELETE(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const orgId = await getOrgId(supabase, user.id);
+  if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+  const { error } = await supabase
+    .from("permits")
+    .delete()
+    .eq("id", id)
+    .eq("organization_id", orgId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  await supabase.from("audit_events").insert({
+    organization_id: orgId,
+    actor_id: user.id,
+    action: "permit.deleted",
+    entity_type: "permit",
+    entity_id: id,
+  });
+
+  return NextResponse.json({ ok: true });
+}

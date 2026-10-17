@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Card, Badge } from "@/components/ui";
 import Link from "next/link";
+import DeleteButton from "@/components/DeleteButton";
 import { DocumentUpload } from "./upload";
 import { DeadlineAdd } from "./deadline-add";
 
@@ -49,12 +50,15 @@ export default async function PermitDetailPage({
             {permit.permit_number && ` - ${permit.permit_number}`}
           </h1>
         </div>
-        <Link
-          href={`/permits/${id}/edit`}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-        >
-          Edit Permit
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href={`/permits/${id}/edit`}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+          >
+            Edit Permit
+          </Link>
+          <DeleteButton endpoint="permits" id={id} label="permit" redirectTo="/permits" />
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

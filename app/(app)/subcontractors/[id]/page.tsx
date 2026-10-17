@@ -6,6 +6,7 @@ import { complianceStatus } from "@/lib/subcontractor-compliance";
 import Link from "next/link";
 import { DocumentUploadForm, DeleteDocButton, InviteForm } from "./components";
 import { SubcontractorEditButton } from "./subcontractor-edit";
+import DeleteButton from "@/components/DeleteButton";
 
 function docTypeBadge(docType: string) {
   if (docType === "license") return <Badge color="blue">License</Badge>;
@@ -71,6 +72,7 @@ export default async function SubcontractorDetailPage({
           </div>
           <div className="flex items-center gap-3">
             <SubcontractorEditButton sub={sub} />
+            <DeleteButton endpoint="subcontractors" id={sub.id} label="subcontractor" redirectTo="/subcontractors" />
             <Badge color={comp.color}>{comp.label}</Badge>
           </div>
         </div>

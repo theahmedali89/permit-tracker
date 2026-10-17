@@ -302,8 +302,11 @@ export default async function DashboardPage() {
   }
 
   const totalPermits = (activeCount || 0) + (pendingCount || 0) + (expiringCount || 0) + (expiredCount || 0);
-  const atRisk = (expiringCount || 0) + (expiredCount || 0);
-  const compliance = totalPermits > 0 ? Math.round(((totalPermits - atRisk) / totalPermits) * 100) : 100;
+  // Health weights: expired = 0 pts (critical), expiring_soon = 50 pts (warning but still valid),
+  // active/pending = 100 pts. An expiring permit should never tank health to 0%.
+  const compliance = totalPermits > 0
+    ? Math.round((((activeCount || 0) + (pendingCount || 0) + (expiringCount || 0) * 0.5) / totalPermits) * 100)
+    : 100;
 
   const todayLabel = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -342,7 +345,7 @@ export default async function DashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Active permits" value={(activeCount || 0) + (pendingCount || 0)} icon={ICONS.shield} tone="success" />
+        <StatCard label="Active permits" value={(activeCount || 0) + (pendingCount || 0) + (expiringCount || 0)} icon={ICONS.shield} tone="success" />
         <StatCard label="Expiring soon" value={expiringCount || 0} icon={ICONS.clock} tone="warning" />
         <StatCard label="Expired" value={expiredCount || 0} icon={ICONS.alert} tone="danger" />
         <StatCard label="Upcoming deadlines" value={upcoming?.length || 0} icon={ICONS.calendar} tone="info" />

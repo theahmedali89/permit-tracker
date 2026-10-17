@@ -20,9 +20,25 @@ export async function GET(request: NextRequest) {
   const today = new Date().toISOString().split("T")[0];
   const results = { sent: 0, failed: 0, skipped: 0, renewals_sent: 0 };
 
+  // Resolve real recipient emails for an organization.
+  // Returns org member emails; empty array if none found (caller skips).
+  async function getOrgEmails(organization_id: string): Promise<string[]> {
+    const { data: members } = await supabase
+      .from("organization_members")
+      .select("user_id")
+      .eq("organization_id", organization_id);
+    if (!members || members.length === 0) return [];
+    const memberIds = new Set(members.map((m: any) => m.user_id));
+    const { data, error } = await supabase.auth.admin.listUsers();
+    if (error || !data) return [];
+    return data.users
+      .filter((u) => memberIds.has(u.id) && u.email)
+      .map((u) => u.email as string);
+  }
+
   // Shared email sender for reminder types
   async function sendReminder(opts: {
-    to: string;
+    to: string[];
     subject: string;
     html: string;
     organization_id: string;
@@ -96,8 +112,13 @@ export async function GET(request: NextRequest) {
           }
 
           try {
+            const recipients = await getOrgEmails(deadline.organization_id);
+            if (recipients.length === 0) {
+              results.skipped++;
+              continue;
+            }
             await sendReminder({
-              to: "placeholder@example.com", // TODO: Get actual user emails
+              to: recipients,
               subject: `⏰ Permit expiring in ${offset} days: ${deadline.permits.permit_type}`,
               html: `
                 <h2>Permit Reminder</h2>
@@ -257,8 +278,13 @@ export async function GET(request: NextRequest) {
       }
 
       try {
+        const recipients = await getOrgEmails(permit.organization_id);
+        if (recipients.length === 0) {
+          results.skipped++;
+          continue;
+        }
         await sendReminder({
-          to: "placeholder@example.com", // TODO: Get actual user emails
+          to: recipients,
           subject: smartReminder
             ? `🔄 Start permit renewal now (${reg?.city || "your jurisdiction"}): ${permit.permit_type}`
             : `🔄 Permit renewal due in ${remaining} days: ${permit.permit_type}`,
@@ -382,8 +408,13 @@ export async function GET(request: NextRequest) {
       }
 
       try {
+        const recipients = await getOrgEmails(item.organization_id);
+        if (recipients.length === 0) {
+          results.skipped++;
+          continue;
+        }
         await sendReminder({
-          to: "placeholder@example.com", // TODO: Get actual user emails
+          to: recipients,
           subject: `Document expiring in ${remaining} days: ${item.file_name}`,
           html: `
             <h2>Document Expiry Reminder</h2>
