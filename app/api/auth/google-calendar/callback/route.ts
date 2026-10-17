@@ -40,6 +40,20 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Only workspace admins may connect (or replace) the org's Google account
+  const { data: membership } = await supabase
+    .from("organization_members")
+    .select("role")
+    .eq("user_id", user.id)
+    .eq("organization_id", orgId)
+    .limit(1)
+    .single();
+  if (membership?.role !== "owner" && membership?.role !== "admin") {
+    return NextResponse.redirect(
+      `${appUrl}/settings?calendar=error&reason=not_admin`
+    );
+  }
+
   try {
     // Must use the SAME redirect_uri that was sent to Google in the
     // authorize step — derived from this request's host, matching exactly.

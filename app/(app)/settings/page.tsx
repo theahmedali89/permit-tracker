@@ -71,7 +71,7 @@ export default async function SettingsPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Google Calendar
           </h2>
-          <GoogleCalendarConnect />
+          <GoogleCalendarConnect isAdmin={membership.role === "owner" || membership.role === "admin"} />
         </Card>
 
         <Card className="p-6">

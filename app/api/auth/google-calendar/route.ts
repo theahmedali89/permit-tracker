@@ -78,11 +78,15 @@ export function verifyState(state: string): string | null {
 async function getOrgId(supabase: any, userId: string) {
   const { data } = await supabase
     .from("organization_members")
-    .select("organization_id")
+    .select("organization_id, role")
     .eq("user_id", userId)
     .limit(1)
     .single();
-  return data?.organization_id;
+  return data;
+}
+
+function isAdminRole(role: string | null | undefined) {
+  return role === "owner" || role === "admin";
 }
 
 // GET /api/auth/google-calendar — start OAuth flow
@@ -91,8 +95,11 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const orgId = await getOrgId(supabase, user.id);
+  const membership = await getOrgId(supabase, user.id);
+  const orgId = membership?.organization_id;
   if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
+  if (!isAdminRole(membership?.role))
+    return NextResponse.json({ error: "Only workspace admins can connect Google Calendar" }, { status: 403 });
 
   let oauth2Client;
   try {

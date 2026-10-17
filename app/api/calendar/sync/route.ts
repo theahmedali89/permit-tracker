@@ -148,8 +148,16 @@ export async function DELETE() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const orgId = await getOrgId(supabase, user.id);
+  const { data: membership } = await supabase
+    .from("organization_members")
+    .select("organization_id, role")
+    .eq("user_id", user.id)
+    .limit(1)
+    .single();
+  const orgId = membership?.organization_id;
   if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
+  if (membership?.role !== "owner" && membership?.role !== "admin")
+    return NextResponse.json({ error: "Only workspace admins can disconnect Google Calendar" }, { status: 403 });
 
   const serviceClient = getServiceClient();
   const { error } = await serviceClient

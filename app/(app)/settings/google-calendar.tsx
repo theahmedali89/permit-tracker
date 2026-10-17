@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, Button } from "@/components/ui";
 
-export function GoogleCalendarConnect() {
+export function GoogleCalendarConnect({ isAdmin = false }: { isAdmin?: boolean }) {
   const [status, setStatus] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -71,13 +71,22 @@ export function GoogleCalendarConnect() {
             <Button onClick={handleSync} disabled={syncing}>
               {syncing ? "Syncing..." : "🔄 Sync Deadlines Now"}
             </Button>
-            <Button onClick={handleDisconnect}>Disconnect</Button>
+            {isAdmin && <Button onClick={handleDisconnect}>Disconnect</Button>}
           </div>
+          {!isAdmin && (
+            <p className="text-xs text-gray-500">
+              Only workspace admins can change the connected Google account.
+            </p>
+          )}
         </div>
-      ) : (
+      ) : isAdmin ? (
         <a href="/api/auth/google-calendar">
           <Button>📅 Connect Google Calendar</Button>
         </a>
+      ) : (
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Google Calendar is not connected yet. Ask a workspace admin to connect it in Settings.
+        </p>
       )}
       {message && <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">{message}</p>}
       <p className="text-xs text-gray-500 mt-2">
