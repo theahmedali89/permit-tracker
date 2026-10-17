@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS jurisdiction_regulations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   jurisdiction_name text NOT NULL,
-  state_code text(2),
+  state_code varchar(2),
   city text,
   permit_type text DEFAULT 'building',
   validity_days int,
