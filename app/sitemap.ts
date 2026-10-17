@@ -7,10 +7,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const entries: MetadataRoute.Sitemap = [
     {
+      url: `${SITE_URL}/`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
       url: `${SITE_URL}/signup`,
       lastModified: now,
       changeFrequency: "yearly",
-      priority: 1.0,
+      priority: 0.9,
     },
     {
       url: `${SITE_URL}/templates/construction-permit-tracking-spreadsheet`,
