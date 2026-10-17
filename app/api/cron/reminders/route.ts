@@ -234,7 +234,24 @@ export async function GET(request: NextRequest) {
       }
 
       if (!deadlineId) continue;
-      if (await alreadySentToday(deadlineId)) {
+      // Smart reminders: at most one per 5 days. Once the smart alert date
+      // is reached, daily emails would mean ~50 messages for slow
+      // jurisdictions (spam); a 5-day cadence keeps ~11 reminders over a
+      // 52-day window — persistent without being ignored.
+      if (smartReminder) {
+        const fiveDaysAgo = new Date();
+        fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 4);
+        const { data: recent } = await supabase
+          .from("reminder_deliveries")
+          .select("id")
+          .eq("deadline_id", deadlineId)
+          .gte("scheduled_for", fiveDaysAgo.toISOString().split("T")[0])
+          .limit(1);
+        if (recent && recent.length > 0) {
+          results.skipped++;
+          continue;
+        }
+      } else if (await alreadySentToday(deadlineId)) {
         results.skipped++;
         continue;
       }
