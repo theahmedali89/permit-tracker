@@ -297,6 +297,7 @@ export default function LandingPage() {
               <Link href="/solutions/roofing" className="hover:text-gray-900 dark:hover:text-white">Roofing</Link>
               <Link href="/solutions/electrical" className="hover:text-gray-900 dark:hover:text-white">Electrical</Link>
               <Link href="/templates/construction-permit-tracking-spreadsheet" className="hover:text-gray-900 dark:hover:text-white">Free template</Link>
+              <Link href="/tools/parcel-lookup" className="hover:text-gray-900 dark:hover:text-white">APN lookup</Link>
               <Link href="/signup" className="hover:text-gray-900 dark:hover:text-white">Sign up</Link>
             </nav>
             <p className="text-sm text-gray-500 dark:text-gray-500">
