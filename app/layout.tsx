@@ -58,7 +58,10 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   themeColor: "#2563eb",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-64.png", sizes: "64x64", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
 };
@@ -69,7 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     "@type": "Organization",
     name: "Permit Warden",
     url: "https://permitwarden.com",
-    logo: "https://permitwarden.com/logo.png",
+    logo: "https://permitwarden.com/logo-mark.png",
     description:
       "Permit, license, and inspection deadline tracking with automatic renewal reminders for small U.S. contractors.",
   };

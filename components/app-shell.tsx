@@ -35,9 +35,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
-            <Link href="/dashboard" className="rounded-lg px-2.5 py-2 bg-white dark:bg-transparent shadow-sm dark:shadow-none hover:shadow transition-shadow">
-              <img src="/logo.png" alt="Permit Warden" className="h-12 w-auto dark:hidden" />
-              <img src="/logo-dark.png" alt="Permit Warden" className="h-12 w-auto hidden dark:block" />
+            <Link href="/dashboard" className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors">
+              <img src="/logo-mark.png" alt="Permit Warden" className="h-10 w-10 rounded-xl shadow-sm" />
+              <span className="text-base font-bold tracking-tight text-gray-900 dark:text-white">
+                Permit <span className="bg-gradient-to-r from-blue-600 to-teal-500 bg-clip-text text-transparent">Warden</span>
+              </span>
             </Link>
           </div>
           <nav className="flex-1 px-2 py-4 space-y-1">
@@ -47,7 +49,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                   pathname === item.href
-                    ? "bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100"
+                    ? "bg-gradient-to-r from-blue-100 to-teal-100 text-blue-950 dark:from-blue-900/60 dark:to-teal-900/60 dark:text-teal-50 shadow-sm"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                 }`}
               >
@@ -88,7 +90,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               href={item.href}
               className={`flex flex-col items-center py-2 px-3 text-xs min-w-[70px] ${
                 pathname === item.href
-                  ? "text-blue-600 dark:text-blue-400"
+                  ? "text-teal-600 dark:text-teal-400"
                   : "text-gray-600 dark:text-gray-400"
               }`}
             >

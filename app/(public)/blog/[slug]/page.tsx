@@ -78,7 +78,7 @@ export default async function BlogPostPage({
     publisher: {
       "@type": "Organization",
       name: "Permit Warden",
-      logo: { "@type": "ImageObject", url: "https://permitwarden.com/logo.png" },
+      logo: { "@type": "ImageObject", url: "https://permitwarden.com/logo-mark.png" },
     },
   };
 

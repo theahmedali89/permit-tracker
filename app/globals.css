@@ -27,3 +27,42 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ---- Permit Warden: floating CTA buttons (subtle idle float + hover lift) ---- */
+@keyframes pw-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+@keyframes pw-float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.pw-float-btn {
+  animation: pw-float 4s ease-in-out infinite;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  will-change: transform;
+}
+.pw-float-btn:hover {
+  animation-play-state: paused;
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.06);
+}
+.pw-float-btn:active {
+  transform: translateY(0) scale(0.99);
+}
+.pw-float-soft {
+  animation: pw-float-soft 5s ease-in-out infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pw-float-btn, .pw-float-soft { animation: none; }
+}
+
+/* ---- Glass panel helper ---- */
+.pw-glass {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 18px 44px rgba(3, 32, 60, 0.28);
+}

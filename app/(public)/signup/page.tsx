@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AuthLayout } from "@/components/auth-layout";
+import { PasswordField } from "../signin/password-field";
 
 export const metadata: Metadata = {
   title: "Sign up - Start tracking permits in minutes",
@@ -38,7 +39,7 @@ const SOFTWARE_JSON_LD = {
 };
 
 const inputCls =
-  "block w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30";
+  "block w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30";
 
 export default async function SignUpPage({
   searchParams,
@@ -85,11 +86,11 @@ export default async function SignUpPage({
             <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Password
             </label>
-            <input id="password" name="password" type="password" required minLength={8} placeholder="Min 8 characters" className={inputCls} />
+          <PasswordField minLength={8} placeholder="Min 8 characters" autoComplete="new-password" />
           </div>
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-600 py-2.5 px-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="pw-float-btn w-full rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 py-3 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
           >
             Create free account
           </button>
