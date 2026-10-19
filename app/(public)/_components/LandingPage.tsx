@@ -133,10 +133,10 @@ export default function LandingPage() {
         </header>
 
         {/* Hero */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-blue-800 via-blue-600 to-teal-600 dark:from-blue-950 dark:via-blue-900 dark:to-teal-900">
-          {/* decorative blobs */}
-          <div className="absolute -top-32 right-0 h-96 w-96 rounded-full bg-teal-300/25 blur-3xl" aria-hidden />
-          <div className="absolute bottom-0 -left-24 h-80 w-80 rounded-full bg-blue-300/25 blur-3xl" aria-hidden />
+        <section className="relative overflow-hidden bg-blue-800 bg-gradient-to-br from-blue-800 via-blue-600 to-teal-600 dark:bg-blue-950 dark:from-blue-950 dark:via-blue-900 dark:to-teal-900">
+          {/* decorative blobs — solid bg-blue-800 above guarantees the white text stays readable even if a mobile browser drops the gradient */}
+          <div className="pointer-events-none absolute -top-32 right-0 h-44 w-44 rounded-full bg-teal-300/25 blur-3xl sm:h-96 sm:w-96" aria-hidden />
+          <div className="pointer-events-none absolute bottom-0 -left-24 h-40 w-40 rounded-full bg-blue-300/25 blur-3xl sm:h-80 sm:w-80" aria-hidden />
           <div
             className="absolute inset-0 opacity-10"
             style={{
@@ -264,8 +264,8 @@ export default function LandingPage() {
         </section>
 
         {/* Final CTA */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-blue-800 via-blue-600 to-teal-600 dark:from-blue-950 dark:via-blue-900 dark:to-teal-900">
-          <div className="absolute -top-24 left-1/3 h-72 w-72 rounded-full bg-teal-300/25 blur-3xl" aria-hidden />
+        <section className="relative overflow-hidden bg-blue-800 bg-gradient-to-br from-blue-800 via-blue-600 to-teal-600 dark:bg-blue-950 dark:from-blue-950 dark:via-blue-900 dark:to-teal-900">
+          <div className="pointer-events-none absolute -top-24 left-1/3 h-36 w-36 rounded-full bg-teal-300/25 blur-3xl sm:h-72 sm:w-72" aria-hidden />
           <div className="relative mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
             <div className="pw-glass mx-auto rounded-3xl p-8 sm:p-10">
               <h2 className="text-3xl font-bold tracking-tight text-white">
