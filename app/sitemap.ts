@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { STATE_NAMES } from "./(public)/ahj/_lib";
+import { LICENSE_BOARDS } from "@/lib/license-boards";
+import { STATE_NAMES, stateSlug } from "./(public)/ahj/_lib";
 
 const SITE_URL = "https://permitwarden.com";
 
@@ -53,6 +54,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${SITE_URL}/tools/parcel-lookup`,
       lastModified: now,
       changeFrequency: "yearly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/tools/license-lookup`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    ...LICENSE_BOARDS.map((b) => ({
+      url: `${SITE_URL}/tools/license-lookup/${stateSlug(b.code)}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    {
+      url: `${SITE_URL}/building-permit`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/certificate-of-occupancy`,
+      lastModified: now,
+      changeFrequency: "monthly",
       priority: 0.8,
     },
     {

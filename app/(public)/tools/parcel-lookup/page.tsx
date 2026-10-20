@@ -129,6 +129,17 @@ export default function ParcelLookupPage() {
             </div>
           </section>
 
+          <section className="mt-14 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-gray-900/70">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">More free tools</h2>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              <Link href="/tools/license-lookup" className="font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400">
+                Contractor License Lookup
+              </Link>{" "}
+              — verify a contractor&apos;s license with the official state board search for
+              your state before you hire.
+            </p>
+          </section>
+
           <section className="mt-14 overflow-hidden rounded-2xl bg-gradient-to-br from-blue-800 via-blue-600 to-teal-600 p-8 text-center sm:p-10 dark:from-blue-950 dark:via-blue-900 dark:to-teal-900">
             <h2 className="text-2xl font-bold text-white sm:text-3xl">
               Found your APN? Never miss a permit deadline on that property.
