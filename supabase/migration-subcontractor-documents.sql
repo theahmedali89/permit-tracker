@@ -109,3 +109,13 @@ CREATE POLICY "Users can delete own org subcontractor invites"
       WHERE user_id = auth.uid()
     )
   );
+
+-- Data API grants (Supabase stops auto-granting new public tables on 2026-10-30;
+-- explicit grants keep these tables reachable whether this runs before or after)
+GRANT SELECT ON public.subcontractor_documents TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.subcontractor_documents TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.subcontractor_documents TO service_role;
+
+GRANT SELECT ON public.subcontractor_invites TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.subcontractor_invites TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.subcontractor_invites TO service_role;
