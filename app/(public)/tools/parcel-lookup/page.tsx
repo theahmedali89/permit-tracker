@@ -43,6 +43,14 @@ const FAQS: Array<[string, string]> = [
     "Is this APN lookup really free?",
     "Yes. The lookup uses the free U.S. Census geocoder to identify your county, then links you directly to your county assessor's official parcel search. No account, no fees, no limits.",
   ],
+  [
+    "How do I get a parcel number?",
+    "You don't apply for one — the county assessor assigns a parcel number to every property automatically. To get the number for a specific property, run an address search on your county assessor's site (the tool above takes you there), or check the property tax bill or the deed, where it is printed. If none of those are handy, the assessor's office can look it up by address.",
+  ],
+  [
+    "Is an APN number the same as a parcel number?",
+    "Yes — they are two names for the same identifier. Counties pick their own label: APN (Assessor's Parcel Number), parcel number, parcel ID, or folio number. Whatever your county calls it, it points to the same property record and serves the same purpose on permit applications and tax documents.",
+  ],
 ];
 
 const FAQ_JSON_LD = {
@@ -110,6 +118,22 @@ export default function ParcelLookupPage() {
                 </li>
               ))}
             </ol>
+          </section>
+
+          <section className="mt-14">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              One lookup, many names
+            </h2>
+            <p className="mt-4 max-w-2xl leading-relaxed text-gray-600 dark:text-gray-300">
+              Counties never agreed on a single label, so the same records search shows up
+              under different names depending on where the property sits: one assessor site
+              calls it an <strong>APN lookup</strong>, another an{" "}
+              <strong>APN number lookup</strong> or <strong>APN search</strong>, and a third
+              just a parcel or property search. They all lead to the same place — the
+              county&apos;s property record for the address, with the same parcel number in
+              it. The number&apos;s format changes from county to county; what it identifies
+              does not.
+            </p>
           </section>
 
           <section className="mt-14">

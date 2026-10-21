@@ -47,6 +47,14 @@ const FAQS: Array<[string, string]> = [
     "It depends on the jurisdiction and the property's history. Some cities require a new CO or a certificate of continued occupancy at resale or tenant change; others only require one after permitted work or a change of use. Lenders and insurers often ask for it either way — check with the local building department before closing.",
   ],
   [
+    "What does CCO mean in construction?",
+    "CCO is short for certificate of continued occupancy. In jurisdictions that use one, a CCO confirms that a building's existing use may legally continue — it is typically checked when ownership or tenancy changes and no construction is planned. It differs from a standard certificate of occupancy, which is issued after new construction, a change of use, or major permitted work.",
+  ],
+  [
+    "What is an occupancy date?",
+    "The occupancy date is the date recorded on the certificate of occupancy — the day the building department issued it and legal occupancy of the building began. It shows up in permit and property records, and occasionally in real-estate listings. It is not necessarily the day anyone actually moved in, and on older buildings the recorded date may come from a later CO issued after a renovation or change of use.",
+  ],
+  [
     "What happens if I occupy a building without a CO?",
     "Penalties vary, but they can include fines, orders to vacate, problems with insurance claims, and trouble selling or refinancing the property. For businesses, occupying without a CO can also block your business license. It is never the place to cut a corner.",
   ],
@@ -179,6 +187,40 @@ export default function CertificateOfOccupancyPage() {
                 building permit guide
               </Link>{" "}
               — what a permit is, when you need one, and how to get it.
+            </p>
+          </section>
+
+          <section className="mt-14">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Beyond the first CO: continued occupancy and reoccupancy
+            </h2>
+            <h3 className="mt-8 text-xl font-bold text-gray-900 dark:text-white">
+              Certificate of continued occupancy (CCO)
+            </h3>
+            <p className="mt-2 leading-relaxed text-gray-600 dark:text-gray-300">
+              A standard CO closes out construction. A <strong>certificate of continued
+              occupancy</strong> covers the opposite situation: nothing is being built, but
+              the people in the building are changing. In many jurisdictions, when a home is
+              sold or a commercial space gets a new tenant, the building department inspects
+              the property and issues a CCO confirming that the existing use is still legal
+              and the space still meets basic life-safety requirements. If you have seen
+              &ldquo;CCO&rdquo; on a permit record and wondered about the CCO construction
+              meaning, that is all it is — a continuation check, not a construction approval,
+              and it authorizes no work. Not every city uses a CCO; the same check may happen
+              under a resale inspection, a rental license, or a fresh CO instead.
+            </p>
+            <h3 className="mt-10 text-xl font-bold text-gray-900 dark:text-white">
+              Reoccupancy: moving back into a vacant or damaged building
+            </h3>
+            <p className="mt-2 leading-relaxed text-gray-600 dark:text-gray-300">
+              <strong>Reoccupancy</strong> means occupying a building again after it has sat
+              vacant, been damaged by fire, flood, or storm, or been posted as unsafe. Many
+              jurisdictions treat reoccupancy like a brand-new move-in: the space has to pass
+              inspection first, a new or amended certificate of occupancy is often required,
+              and utilities may not be reconnected until the building department signs off —
+              even if the building had a valid CO before it emptied. If a property has been
+              empty for a while, ask the building department what reoccupancy requires before
+              assuming the old CO still covers it.
             </p>
           </section>
 

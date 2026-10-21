@@ -35,6 +35,10 @@ const FAQS: Array<[string, string]> = [
     "Confirm the requirements with your local building department, prepare plans and documents, submit the application and pay the fees, respond to plan-review corrections, and receive the issued permit. Then build to the approved plans, call for inspections at each stage, and pass the final to close the permit out.",
   ],
   [
+    "Where do I obtain a building permit?",
+    "From the building department of the city or county where the property is located — the Authority Having Jurisdiction (AHJ). There is no state or national permit office. Most departments accept applications through an online portal, and many still take paper applications at the counter. Find your AHJ's official portal in our directory, and confirm which application route it currently uses before you prepare your plans.",
+  ],
+  [
     "How much does a building permit cost?",
     "Fees are set locally and usually scale with the project's value, size, or type — a bathroom remodel and a warehouse pay very different amounts, and extra fees (plan review, school, utility, impact) can apply. There is no national price. Your building department publishes a fee schedule; find the official portal for your city in our AHJ directory.",
   ],
