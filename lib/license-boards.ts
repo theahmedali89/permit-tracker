@@ -75,7 +75,7 @@ export const LICENSE_BOARDS: LicenseBoard[] = [
     lookupUrl: "https://www.tdlr.texas.gov/LicenseSearch/",
     covers: [
       "Electricians and electrical contractors (TDLR)",
-      "Air conditioning and refrigeration contractors (TDLR)",
+      "Air conditioning and refrigeration contractors (TDLR, commonly searched as a TACL license)",
       "Plumbers are licensed separately by the Texas State Board of Plumbing Examiners (TSBPE)",
     ],
     searchBy: "license type, license number, name or business name, city, county, or ZIP code",
@@ -238,6 +238,7 @@ export const LICENSE_BOARDS: LicenseBoard[] = [
       "General contractors — building, residential, highway, public utilities, and grading/excavating",
       "License limitations (Limited, Intermediate, Unlimited) by project value",
       "Electrical and plumbing/HVAC are licensed by their own NC boards",
+      "Engineers and land surveyors are licensed separately by the NC Board of Examiners for Engineers and Surveyors (NCBELS)",
     ],
     searchBy: "classification type, license number, company name, or qualifier name",
     summary:

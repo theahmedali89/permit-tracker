@@ -96,7 +96,9 @@ export default function LicenseLookupPage() {
             Before you hire a contractor — or sign a subcontract — verify their license with
             the only source that counts: <strong>the state licensing board itself</strong>.
             Pick your state below and we&apos;ll route you to the official board search,
-            with exactly what to check when you get there.
+            with exactly what to check when you get there. Use this contractor lookup
+            before you sign anything. It takes a minute and can save you from hiring
+            an unlicensed contractor.
           </p>
 
           <LicenseStatePicker />

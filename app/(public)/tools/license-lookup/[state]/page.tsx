@@ -108,6 +108,10 @@ export default async function LicenseLookupStatePage({
           <p className="mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
             {board.summary}
           </p>
+          <p className="mt-3 max-w-2xl text-gray-600 dark:text-gray-300">
+            Use this {board.state} contractor lookup to verify any contractor&apos;s license
+            status before you sign a contract.
+          </p>
 
           {board.nuance && (
             <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-relaxed text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200">
