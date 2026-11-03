@@ -62,6 +62,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    {
+      url: `${SITE_URL}/tools/noise-ordinance-lookup`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/tools/shed-permit-checker`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     ...LICENSE_BOARDS.map((b) => ({
       url: `${SITE_URL}/tools/license-lookup/${stateSlug(b.code)}`,
       lastModified: now,
