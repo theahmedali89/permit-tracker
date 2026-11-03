@@ -187,6 +187,27 @@ export default function NoiseOrdinanceLookupPage() {
 
           <section className="mt-14">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Browse noise ordinances by city
+            </h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-300">
+              Each city page shows the full verified rule set: weekday hours, weekend
+              rules, dB limits, and the official source document.
+            </p>
+            <div className="mt-6 grid gap-2 sm:grid-cols-2">
+              {CITIES.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/tools/noise-ordinance/${c.slug}`}
+                  className="rounded-xl border border-white/60 bg-white/70 px-5 py-3 text-sm font-medium text-sky-700 shadow-sm backdrop-blur hover:border-sky-300 dark:border-white/10 dark:bg-gray-900/70 dark:text-sky-300"
+                >
+                  {c.city}, {c.stateCode} noise ordinance →
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-14">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               Noise ordinance FAQs
             </h2>
             <div className="mt-6 space-y-4">

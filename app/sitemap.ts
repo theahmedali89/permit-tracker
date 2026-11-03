@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { LICENSE_BOARDS } from "@/lib/license-boards";
 import { STATE_NAMES, stateSlug } from "./(public)/ahj/_lib";
+import { CITIES } from "./(public)/tools/_data/noise-shed";
 
 const SITE_URL = "https://permitwarden.com";
 
@@ -74,6 +75,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    ...CITIES.map((c) => ({
+      url: `${SITE_URL}/tools/noise-ordinance/${c.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     ...LICENSE_BOARDS.map((b) => ({
       url: `${SITE_URL}/tools/license-lookup/${stateSlug(b.code)}`,
       lastModified: now,
