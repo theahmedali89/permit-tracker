@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
+import { CITIES, type CityRecord } from "@/app/(public)/tools/_data/noise-shed";
 
 export async function GET(request: NextRequest) {
   // Verify cron secret
@@ -86,13 +87,50 @@ export async function GET(request: NextRequest) {
     return Math.ceil((dueDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
   }
 
+  // ---- Construction-hours context (Permit Warden cluster Phase 3) ----
+  // Matches a permit's free-text jurisdiction against the 20 verified
+  // Phase-0 cities, case-insensitively on city + state code. A city+state
+  // hit wins outright; a city-only hit is kept as a fallback.
+  // Returns null when there is no match, so the email stays unchanged.
+  function matchCity(jurisdiction: string | null | undefined): CityRecord | null {
+    if (!jurisdiction) return null;
+    const j = jurisdiction.toLowerCase();
+    let cityOnly: CityRecord | null = null;
+    for (const c of CITIES) {
+      const city = c.city.toLowerCase().trim();
+      // "New York City" also matches plain "New York" in jurisdiction text
+      const cityShort = city.endsWith(" city") ? city.slice(0, -5) : city;
+      if (!city || (!j.includes(city) && !j.includes(cityShort))) continue;
+      const state = c.stateCode.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (state && new RegExp(`\\b${state}\\b`).test(j)) return c;
+      if (!cityOnly) cityOnly = c;
+    }
+    return cityOnly;
+  }
+
+  // Small verified construction-hours context block for reminder emails.
+  // Only renders when the permit's jurisdiction matches a verified city;
+  // null/unverified fields are skipped, never invented.
+  function constructionHoursBlock(jurisdiction: string | null | undefined): string {
+    const c = matchCity(jurisdiction);
+    if (!c) return "";
+    const n = c.noise;
+    const parts: string[] = [];
+    if (n.weekdayHours) parts.push(`Weekdays: ${n.weekdayHours}`);
+    if (n.weekendHours) parts.push(`Weekends: ${n.weekendHours}`);
+    if (n.note) parts.push(n.note);
+    if (n.dbLimits) parts.push(`Noise limits: ${n.dbLimits}`);
+    if (parts.length === 0) return "";
+    return `<p><strong>Construction hours in ${c.city}, ${c.stateCode}:</strong> ${parts.join(" ")} <a href="${n.sourceUrl}">Source: ${n.sourceLabel}</a></p>`;
+  }
+
   try {
     // Get all pending deadlines with their reminder rules
     const { data: deadlines } = await supabase
       .from("deadlines")
       .select(`
         *,
-        permits!inner(permit_type, permit_number, expiration_date),
+        permits!inner(permit_type, permit_number, expiration_date, jurisdiction),
         organizations!inner(name)
       `)
       .eq("status", "pending")
@@ -126,6 +164,7 @@ export async function GET(request: NextRequest) {
                 <p><strong>Permit:</strong> ${deadline.permits.permit_type} ${deadline.permits.permit_number || ""}</p>
                 <p><strong>Due Date:</strong> ${deadline.due_date}</p>
                 <p><strong>Days Remaining:</strong> ${offset}</p>
+                ${constructionHoursBlock(deadline.permits.jurisdiction)}
                 <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/permits">View in dashboard</a></p>
               `,
               organization_id: deadline.organization_id,
@@ -296,6 +335,7 @@ export async function GET(request: NextRequest) {
             ${smartReminder
               ? `<p><strong>Why now:</strong> renewals in ${reg?.city || "this jurisdiction"} typically take ${processingDays} days to process — starting today keeps you covered.</p>`
               : `<p><strong>Days Remaining:</strong> ${remaining}</p>`}
+            ${constructionHoursBlock(permit.jurisdiction)}
             <p>Start the renewal paperwork now to avoid a lapse in coverage.</p>
             <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/permits/${permit.id}">View permit</a></p>
           `,
