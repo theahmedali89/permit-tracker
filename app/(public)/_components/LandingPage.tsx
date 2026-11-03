@@ -8,6 +8,8 @@ const FEATURES: [string, string][] = [
   ["Snap a photo, skip the typing", "Upload a photo of a permit or license and the form pre-fills itself with OCR."],
   ["Google Calendar sync", "Deadlines land on your calendar automatically, alongside everything else."],
   ["One dashboard, every jurisdiction", "Permits across cities, counties, and states on a single screen — filter by what's expiring, not by folder."],
+  ["Noise ordinance lookup", "Verified construction hours and residential noise limits for 20 major US cities, free."],
+  ["Shed, fence & pergola permit checker", "Pick your city and see instantly whether your project needs a permit, with the official rule linked."],
 ];
 
 const STEPS: [string, string][] = [
@@ -120,6 +122,34 @@ export default function LandingPage() {
               <a href="#how" className="hover:text-gray-900 dark:hover:text-white">How it works</a>
               <a href="#faq" className="hover:text-gray-900 dark:hover:text-white">FAQ</a>
               <Link href="/blog" className="hover:text-gray-900 dark:hover:text-white">Blog</Link>
+              <div className="group relative">
+                <button className="flex cursor-pointer items-center gap-1 hover:text-gray-900 dark:hover:text-white" aria-haspopup="true">
+                  Tools
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <div className="invisible absolute right-0 top-full w-64 translate-y-1 pt-2 opacity-0 transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                  <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-900">
+                    <Link href="/tools/noise-ordinance-lookup" className="block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/5">
+                      <span className="block font-semibold text-gray-900 dark:text-white">Noise ordinance lookup</span>
+                      <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">Construction hours for 20 cities</span>
+                    </Link>
+                    <Link href="/tools/shed-permit-checker" className="block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/5">
+                      <span className="block font-semibold text-gray-900 dark:text-white">Shed permit checker</span>
+                      <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">Shed, fence and pergola rules by city</span>
+                    </Link>
+                    <Link href="/tools/license-lookup" className="block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/5">
+                      <span className="block font-semibold text-gray-900 dark:text-white">License lookup</span>
+                      <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">Verify a contractor license</span>
+                    </Link>
+                    <Link href="/tools/parcel-lookup" className="block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/5">
+                      <span className="block font-semibold text-gray-900 dark:text-white">APN lookup</span>
+                      <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">Parcel details by APN</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </nav>
             <div className="flex items-center gap-3">
               <Link href="/signin" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
@@ -299,6 +329,8 @@ export default function LandingPage() {
               <Link href="/templates/construction-permit-tracking-spreadsheet" className="hover:text-gray-900 dark:hover:text-white">Free template</Link>
               <Link href="/tools/parcel-lookup" className="hover:text-gray-900 dark:hover:text-white">APN lookup</Link>
               <Link href="/tools/license-lookup" className="hover:text-gray-900 dark:hover:text-white">License lookup</Link>
+              <Link href="/tools/noise-ordinance-lookup" className="hover:text-gray-900 dark:hover:text-white">Noise ordinance lookup</Link>
+              <Link href="/tools/shed-permit-checker" className="hover:text-gray-900 dark:hover:text-white">Shed permit checker</Link>
               <Link href="/signup" className="hover:text-gray-900 dark:hover:text-white">Sign up</Link>
             </nav>
             <p className="text-sm text-gray-500 dark:text-gray-500">
