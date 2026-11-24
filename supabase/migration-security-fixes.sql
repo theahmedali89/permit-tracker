@@ -164,7 +164,7 @@ DECLARE
   r RECORD;
 BEGIN
   FOR r IN
-    SELECT conname
+    SELECT conrelid, conname
     FROM pg_constraint
     WHERE conrelid IN ('public.permits'::regclass, 'public.licenses'::regclass)
       AND contype = 'c'
