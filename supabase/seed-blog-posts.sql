@@ -545,6 +545,16 @@ Always request the extension. It's typically cheap or free, takes a phone call o
 Permit expirations, license renewals, inspection schedules — across multiple jurisdictions, each with different rules — is too much to track manually. The contractors who never miss a deadline aren't more organized by nature; they just have a system.
 
 [Permit Warden](https://permitwarden.com/signup) is that system: every permit, license, and inspection in one dashboard, with automatic renewal reminders at 30, 14, 7, and 1 day out. Set it up once, and never think about expiration dates again.
+
+## Sources
+
+Sources verified November 24, 2026. The 180-day commencement rule below comes from the model building code; the city figures come from each city’s own publication. Extension rules vary by jurisdiction — always confirm with the AHJ that issued the permit.
+
+- [International Code Council, 2021 I-Codes: Application and Administration (Section 105.5, Expiration of Permit)](https://www.iccsafe.org/wp-content/uploads/Session-146-2021-Application-and-Administration-of-the-I-Codes.pdf) — the model-code root of the 180-day rule: a permit becomes invalid unless work commences within 180 days of issuance, or is suspended or abandoned for 180 days; the building official may grant one or more written extensions of up to 180 days each.
+- [NYC Department of Buildings, Permit Renewal](https://www.nyc.gov/site/buildings/property-or-business-owner/permit-renewal.page) — New York permits valid up to 2 years; renew online via DOB NOW:Build about 2 weeks before expiration; $130 renewal fee.
+- [Los Angeles Municipal Code §98.0602 (American Legal Publishing)](https://codelibrary.amlegal.com/codes/los_angeles/latest/lamc/0-0-0-190414) — Los Angeles permits valid 2 years from issuance.
+- [City of San Antonio, Permit Process](https://www.sa.gov/Directory/Departments/DSD/Constructing/Business-Commercial/Permit-Process) — permits expire within 180 days with no proof of work or progress; one or more 180-day extensions for a valid, justifiable reason.
+- [City of Jacksonville, Building Inspection Division FAQs](https://www.jacksonville.gov/departments/public-works/building-inspection-division/faqs) — “HOW LONG ARE PERMITS GOOD FOR? 180 days.”
 $$, TRUE, NOW(), 'Building Permit Renewal Guide for Contractors', 'When do building permits need renewal? Timelines, lapse consequences & a system for tracking renewals across every jurisdiction you work in.'),
 ('what-is-ahj-authority-having-jurisdiction', 'What Is an AHJ (Authority Having Jurisdiction)?', 'AHJ stands for Authority Having Jurisdiction — the government body that issues your permits and enforces the code. Learn how to identify yours, why it matters, and how working across multiple AHJs complicates compliance.', $$# What Is an AHJ (Authority Having Jurisdiction)?
 
@@ -650,5 +660,13 @@ Start with our AHJ directory, which links directly to official permit portals by
 The AHJ concept is simple, but its implications run through everything a contractor does — from bidding (which jurisdiction's fees and timelines apply?) to closeout (whose final inspection and certificate do you need?).
 
 [Permit Warden](https://permitwarden.com/signup) was built for contractors who work across jurisdictions: one dashboard for every permit and deadline, an AHJ directory for finding the right authority, and automatic reminders so nothing expires.
+
+## Sources
+
+Sources verified November 24, 2026. The definition of an AHJ comes from NFPA; the permit-administration rules come from the model building code. Our own AHJ directory lists the authority for each jurisdiction with its official portal link.
+
+- [NFPA, Official Definitions §3.2.2, Authority Having Jurisdiction (AHJ) (nfpa.org)](https://docinfofiles.nfpa.org/files/AboutTheCodes/17/17_A2026_DRY_AAA_FD_PIResponses.pdf) — “An organization, office, or individual responsible for enforcing the requirements of a code or standard, or for approving equipment, materials, an installation, or a procedure.”
+- [International Code Council, 2021 I-Codes: Application and Administration (Section 105.5, Expiration of Permit)](https://www.iccsafe.org/wp-content/uploads/Session-146-2021-Application-and-Administration-of-the-I-Codes.pdf) — the model-code root of the 180-day rule: a permit becomes invalid unless work commences within 180 days of issuance, or is suspended or abandoned for 180 days; the building official may grant one or more written extensions of up to 180 days each.
+- [Permit Warden, AHJ Directory](/ahj) — permit authorities by state and city, with official portal links.
 $$, TRUE, NOW(), 'What Is an AHJ? Authority Having Jurisdiction Explained', 'AHJ explained: what Authority Having Jurisdiction means, how to find yours, and why contractors working across jurisdictions need a system.')
 ON CONFLICT (slug) DO NOTHING;

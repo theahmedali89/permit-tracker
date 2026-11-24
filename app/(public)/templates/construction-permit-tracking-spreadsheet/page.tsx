@@ -131,6 +131,18 @@ export default function TemplateLandingPage() {
           </div>
 
           <h2 className="mt-12 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
+            How to use the template
+          </h2>
+          <ol className="mt-6 list-decimal space-y-4 pl-6">
+            {HOW_TO_JSON_LD.step.map((s) => (
+              <li key={s.name}>
+                <p className="font-semibold text-gray-900 dark:text-white">{s.name}</p>
+                <p className="mt-1 text-gray-600 dark:text-gray-400">{s.text}</p>
+              </li>
+            ))}
+          </ol>
+
+          <h2 className="mt-12 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
             Who it&apos;s for
           </h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">

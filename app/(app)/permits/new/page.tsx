@@ -16,11 +16,15 @@ export default function NewPermitPage() {
   // Pre-fill targets for the document scanner below; stay fully editable.
   const [permitNumber, setPermitNumber] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
+  const [issueDate, setIssueDate] = useState("");
+  const [jurisdiction, setJurisdiction] = useState("");
 
   /** Apply values chosen from the OCR scan into the form (still editable). */
   function handleOcrExtract(v: OcrPrefill) {
     if (v.permit_number !== undefined) setPermitNumber(v.permit_number);
     if (v.expiration_date !== undefined) setExpirationDate(v.expiration_date);
+    if (v.issue_date !== undefined) setIssueDate(v.issue_date);
+    if (v.jurisdiction !== undefined) setJurisdiction(v.jurisdiction);
   }
 
   useEffect(() => {
@@ -108,7 +112,12 @@ export default function NewPermitPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Jurisdiction
               </label>
-              <Input name="jurisdiction" placeholder="Austin, TX" />
+              <Input
+                name="jurisdiction"
+                placeholder="Austin, TX"
+                value={jurisdiction}
+                onChange={(e) => setJurisdiction(e.target.value)}
+              />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4">
@@ -116,7 +125,12 @@ export default function NewPermitPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Issue Date
               </label>
-              <Input name="issue_date" type="date" />
+              <Input
+                name="issue_date"
+                type="date"
+                value={issueDate}
+                onChange={(e) => setIssueDate(e.target.value)}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

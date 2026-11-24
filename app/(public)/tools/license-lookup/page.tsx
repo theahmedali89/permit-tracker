@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LICENSE_BOARDS } from "@/lib/license-boards";
+import { LICENSE_BOARDS } from "@/lib/shared/license-boards";
 import { stateSlug } from "../../ahj/_lib";
 import { LicenseStatePicker } from "./_picker";
 
 const PAGE_URL = "https://permitwarden.com/tools/license-lookup";
 const TITLE = "Contractor License Lookup — Verify a Contractor's License Free";
 const DESCRIPTION =
-  "Free contractor license lookup: pick your state and we'll send you to the official state licensing board's search to verify a contractor's license status, classification, and disciplinary record.";
+  "Free contractor license lookup: pick your state and we'll send you to the official state licensing board search to verify a license's status and record.";
 
 export const metadata: Metadata = {
   title: TITLE,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "@/components/theme-provider";
@@ -38,7 +39,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           onClick={onNavigate}
           className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors"
         >
-          <img src="/logo-mark.png" alt="Permit Warden" className="h-10 w-10 rounded-xl shadow-sm" />
+          <Image src="/logo-mark.png" alt="Permit Warden" width={40} height={40} className="h-10 w-10 rounded-xl shadow-sm" />
           <span className="text-base font-bold tracking-tight text-gray-900 dark:text-white">
             Permit <span className="bg-gradient-to-r from-blue-600 to-teal-500 bg-clip-text text-transparent">Warden</span>
           </span>
@@ -135,7 +136,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </svg>
           </button>
           <Link href="/dashboard" className="flex items-center gap-2">
-            <img src="/logo-mark.png" alt="Permit Warden" className="h-8 w-8 rounded-lg shadow-sm" />
+            <Image src="/logo-mark.png" alt="Permit Warden" width={32} height={32} className="h-8 w-8 rounded-lg shadow-sm" />
             <span className="text-base font-bold tracking-tight text-gray-900 dark:text-white">
               Permit <span className="bg-gradient-to-r from-blue-600 to-teal-500 bg-clip-text text-transparent">Warden</span>
             </span>

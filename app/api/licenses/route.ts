@@ -1,143 +1,36 @@
+// Thin route: license logic lives in lib/features/licenses.
 import { createClient } from "@/lib/supabase/server";
-import { calculatePermitStatus } from "@/lib/permit-status";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { runFeature } from "@/lib/shared/http";
+import { requireAuthOrg } from "@/lib/shared/route-helpers";
+import {
+  createLicense,
+  listLicenses,
+  updateLicense,
+} from "@/lib/features/licenses";
 
-async function getOrgId(supabase: any, userId: string) {
-  const { data } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", userId)
-    .limit(1)
-    .single();
-  return data?.organization_id;
-}
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const orgId = await getOrgId(supabase, user.id);
-  if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
-
-  const { data, error } = await supabase
-    .from("licenses")
-    .select("*")
-    .eq("organization_id", orgId)
-    .order("expiration_date", { ascending: true });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  return runFeature(async () => {
+    const { orgId } = await requireAuthOrg(supabase);
+    return listLicenses(supabase, orgId, new URL(request.url).searchParams);
+  });
 }
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const orgId = await getOrgId(supabase, user.id);
-  if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
-
-  const body = await request.json();
-  const { license_name, license_number, issuing_authority, state, issue_date, expiration_date, renewal_date, notes } = body;
-
-  if (!license_name) return NextResponse.json({ error: "License name required" }, { status: 400 });
-
-  const status = calculatePermitStatus(expiration_date, renewal_date);
-
-  const { data, error } = await supabase
-    .from("licenses")
-    .insert({
-      organization_id: orgId,
-      license_name, license_number, issuing_authority, state,
-      issue_date: issue_date || null,
-      expiration_date: expiration_date || null,
-      renewal_date: renewal_date || null,
-      status, notes,
-    })
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  if (expiration_date) {
-    await supabase.from("deadlines").insert({
-      organization_id: orgId,
-      resource_type: "license",
-      resource_id: data.id,
-      deadline_type: "expiration",
-      due_date: expiration_date,
-    });
-  }
-
-  await supabase.from("audit_events").insert({
-    organization_id: orgId,
-    actor_id: user.id,
-    action: "license.created",
-    entity_type: "license",
-    entity_id: data.id,
+  return runFeature(async () => {
+    const { user, orgId } = await requireAuthOrg(supabase);
+    const body = await request.json().catch(() => null);
+    return createLicense(supabase, orgId, user.id, body);
   });
-
-  return NextResponse.json(data, { status: 201 });
 }
 
 export async function PATCH(request: NextRequest) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const orgId = await getOrgId(supabase, user.id);
-  if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
-
-  const body = await request.json();
-  const { id, ...updates } = body;
-  if (!id) return NextResponse.json({ error: "License ID required" }, { status: 400 });
-
-  const { data: existing } = await supabase
-    .from("licenses")
-    .select("id, expiration_date, renewal_date")
-    .eq("id", id)
-    .eq("organization_id", orgId)
-    .single();
-  if (!existing) return NextResponse.json({ error: "License not found" }, { status: 404 });
-
-  const allowed = [
-    "license_name", "license_number", "issuing_authority", "state",
-    "issue_date", "expiration_date", "renewal_date", "notes",
-  ];
-  const filtered: Record<string, any> = {};
-  for (const f of allowed) {
-    if (updates[f] !== undefined) filtered[f] = updates[f] || null;
-  }
-
-  if (filtered.license_name !== undefined && !filtered.license_name) {
-    return NextResponse.json({ error: "License name is required" }, { status: 400 });
-  }
-
-  // Recalculate status when dates change
-  if (filtered.expiration_date !== undefined || filtered.renewal_date !== undefined) {
-    const exp = filtered.expiration_date !== undefined ? filtered.expiration_date : existing.expiration_date;
-    const ren = filtered.renewal_date !== undefined ? filtered.renewal_date : existing.renewal_date;
-    filtered.status = calculatePermitStatus(exp, ren);
-  }
-
-  const { data, error } = await supabase
-    .from("licenses")
-    .update(filtered)
-    .eq("id", id)
-    .eq("organization_id", orgId)
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  await supabase.from("audit_events").insert({
-    organization_id: orgId,
-    actor_id: user.id,
-    action: "license.updated",
-    entity_type: "license",
-    entity_id: id,
+  return runFeature(async () => {
+    const { user, orgId } = await requireAuthOrg(supabase);
+    const body = await request.json().catch(() => null);
+    return updateLicense(supabase, orgId, user.id, body);
   });
-
-  return NextResponse.json(data);
 }

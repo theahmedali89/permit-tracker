@@ -4,13 +4,21 @@
 -- Researched 2026-10-16 from city building department pages and municipal code.
 --
 -- Cities where NO building-permit regulatory data could be verified (all fields NULL):
---   Dallas TX, Denver CO, Oklahoma City OK
+--   Oklahoma City OK (only; Dallas and Denver were enriched 2026-11-24 — see below)
 -- Cities with PARTIAL data only (see source_url for what was verified):
---   Los Angeles CA (validity only; no city-specific extension source found),
---   San Antonio TX (validity + extension form existence; fee/process unverified),
+--   Los Angeles CA (validity + extension process verified 2026-11-24; LAMC 98.0602),
+--   San Antonio TX (validity + extension process verified 2026-11-24; sa.gov),
 --   Charlotte NC (validity only; extension process not found on official pages),
---   Jacksonville FL (validity only; source is an actual issued City permit document),
---   Indianapolis IN (extension form exists; validity/fee/process unverified)
+--   Jacksonville FL (validity only; official City FAQ),
+--   Indianapolis IN (validity 365 days + extension verified 2026-11-24; Code §536-213),
+--   Dallas TX (validity + extension verified 2026-11-24; City Planning & Development Guide),
+--   Denver CO (60-day voiding rule verified 2026-11-24; 2025 Denver Building Code §131.7 — no fixed maximum duration)
+-- Corrections 2026-11-24: see lib/shared/jurisdiction-data.ts header + AUDIT_REPORT.md §6.1.
+-- Pass 2 corrections 2026-11-24: see CONTENT_ENRICHMENT_REPORT.md.
+-- The matching UPDATE migration for live DBs is
+-- supabase/migration-regulation-corrections-2026-11-24.sql (this seed uses
+-- ON CONFLICT DO NOTHING, so re-running it does NOT update existing rows).
+-- Pass 2 UPDATEs live in supabase/migration-content-enrichment-2026-11-24.sql.
 -- Re-runnable: ON CONFLICT (city, state_code, permit_type) DO NOTHING.
 
 INSERT INTO jurisdiction_regulations
@@ -24,10 +32,12 @@ VALUES
    24,
    'https://www.nyc.gov/site/buildings/property-or-business-owner/permit-renewal.page https://www.Nyc.gov/assets/buildings/pdf/reinstatement_fees-sn.pdf https://transparent.city/c/new-york-city/stories/9gq6eB81'),
 
-  ('Los Angeles', 'CA', 'Los Angeles', 'building', 180,
-   'Inactive 180+ days leads to expiration (LADBS form PC-STR.Mod 40); LADBS permits also carry a 2-yr max and a 180-day continuous-no-work rule (LAMC 98.0602)',
-   NULL, NULL, NULL, NULL,
-   'https://staging.testladbs.org/sites/default/files/efs/forms/pc14/expiration-of-building-permit-pc-str-mod40-2020.pdf'),
+  ('Los Angeles', 'CA', 'Los Angeles', 'building', 730,
+   'Valid 2 yrs from issuance (LAMC 98.0602, as amended Ord. 187,719 eff. 1/23/23); expires 12 mo after issuance if work not commenced, or after 12 continuous months suspended/discontinued/abandoned. Note: LADBS FAQ still states 6-month no-start/no-work windows — the current code says 12 months.',
+   true, NULL,
+   'File within 30 days of expiration via Request for Modification Form 41a or 42; each extension 6 months within the 2-year limit (LADBS FAQ)',
+   NULL,
+   'https://codelibrary.amlegal.com/codes/los_angeles/latest/lamc/0-0-0-190414 https://dbs.lacity.gov/node/4081'),
 
   ('Chicago', 'IL', 'Chicago', 'building', 180,
    '6 mo from payment to begin work and request first inspection (14A-4-413.9); on hold/no inspection for more than 365 days requires reinstatement',
@@ -55,12 +65,14 @@ VALUES
    true, NULL,
    'Written request; code official may extend in writing: up to 2 extensions (12 mo total) to commence work, up to 1 extension (6 mo) for suspended work; expired permits require a new permit (A-302.2)',
    15,
-   'https://www.phila.gov/media/20260107101229/P_052_INF_Building-permit-extension-info-sheet-rev-1.2026.pdf https://phila.gov/media/20220616124113/StartRight-FINAL-6.16.2022.pdf'),
+   'https://www.phila.gov/media/20260707130349/P_052_INF_Building-permit-extension-info-sheet-WebUI.pdf https://phila.gov/media/20220616124113/StartRight-FINAL-6.16.2022.pdf'),
 
   ('San Antonio', 'TX', 'San Antonio', 'building', 180,
-   'Applications/permits without activity for more than 180 days are considered expired; customers must reapply in BuildSA (DSD Development Insight newsletter, Sept 2021)',
-   true, NULL, NULL, NULL,
-   'https://myemail.constantcontact.com/Development-Insight---September-2021.html?soid=1103584053082&aid=I88JjtQf-Ao http://docsonline.sanantonio.gov/DSDDocsOnline/?document=Form%2C+Applications'),
+   'Every permit application and permit will expire within 180 days if no proof of work or progress has been shown (City of San Antonio, Permit Process)',
+   true, NULL,
+   'One or more 180-day extensions when you can prove a valid, justifiable reason for the project suspension or abandonment (City of San Antonio, Permit Process)',
+   NULL,
+   'https://www.sa.gov/Directory/Departments/DSD/Constructing/Business-Commercial/Permit-Process http://docsonline.sanantonio.gov/DSDDocsOnline/?document=Form%2C+Applications'),
 
   ('San Diego', 'CA', 'San Diego', 'building', 365,
    'One-year utilization period (IB 117); void if work not begun within 180 days or suspended/abandoned 180 days (SDMC sections 129.0216/129.0217)',
@@ -69,7 +81,12 @@ VALUES
    NULL,
    'https://www.sandiego.gov/development-services/forms-publications/information-bulletin/117'),
 
-  ('Dallas', 'TX', 'Dallas', 'building', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  ('Dallas', 'TX', 'Dallas', 'building', 730,
+   'Permits expire after 2 years from issuance, or after 120 days of no inspection activity — whichever comes first (City of Dallas Planning & Development Guide; verified November 24, 2026)',
+   true, 200,
+   'Request an Extension in DallasNow before the permit expires; $200 fee for issued permits, no fee for applications (City of Dallas Planning & Development Guide)',
+   NULL,
+   'https://dallascityhall.com/departments/sustainabledevelopment/guide/Pages/default.aspx'),
 
   ('San Jose', 'CA', 'San Jose', 'building', 365,
    'Expires 12 months from issuance or 180 days from last inspection approval/partial approval',
@@ -86,16 +103,16 @@ VALUES
    'https://www.austintexas.gov/development-services/apply-standalone-permit https://austin.widen.net/content/dlenjownlx/original/DSD_RequestForExtensionWithdrawalOrReactivation.pdf?u=x8lbbe&download=true'),
 
   ('Jacksonville', 'FL', 'Jacksonville', 'building', 180,
-   'City of Jacksonville Building Inspection Division permit terms (actual issued permit document): permit may become void if no work done during a six-month period',
+   'HOW LONG ARE PERMITS GOOD FOR? 180 days. (City of Jacksonville, Building Inspection Division FAQs; Division enforces Florida Building Code 8th Edition (2023). Permit may become void if no work done during a six-month period — FBC 105.4.1.)',
    NULL, NULL, NULL, NULL,
-   'https://documents.sparkplatform.com/documents/nef/20201008171310348348000000.pdf'),
+   'https://www.jacksonville.gov/departments/public-works/building-inspection-division/faqs'),
 
   ('Fort Worth', 'TX', 'Fort Worth', 'building', 180,
    'Building permits expire 180 days from date issued unless work has begun or an extension is requested (City building code Sec. 105.5; stated in official zoning case record)',
    true, NULL,
    'One 180-day extension may be requested; per Sec. 105.5 a permit shall not extend more than once when no work has proceeded',
    NULL,
-   'http://apps.fortworthtexas.gov/council_packet/render_file.asp?filename=Zoning_cases/3713/ZC-16-035.pdf'),
+   'https://apps.fortworthtexas.gov/council_packet/render_file.asp?filename=Zoning_cases/3713/ZC-16-035.pdf'),
 
   ('Columbus', 'OH', 'Columbus', 'building', 365,
    'Work must begin within 1 year of issuance; once begun, no delays in progress over 6 months; all related building/mechanical/electrical/plumbing permits treated as a single project for expiration',
@@ -116,9 +133,12 @@ VALUES
    NULL,
    'https://www.sf.gov/documents/38140/26.07.12__Permit_Extension_How_To.pdf https://sfgov.legistar.com/View.ashx?M=F&ID=2287597&GUID=82ACD390-690C-4F44-B31A-6164F04DD972&From=Granicus'),
 
-  ('Indianapolis', 'IN', 'Indianapolis', 'building', NULL, NULL,
-   true, NULL, NULL, NULL,
-   'https://citybase-cms-prod.s3.amazonaws.com/ae27b0e6e82049e89a1105e9e89f51dd.pdf'),
+  ('Indianapolis', 'IN', 'Indianapolis', 'building', 365,
+   'Expires by operation of law if construction not commenced within 365 days of issuance, or if commenced but substantially no construction occurs over 365 days (Indianapolis Code §536-213, as amended through G.O. 40, 2025, §6)',
+   true, NULL,
+   'Administrator may extend for good cause shown in writing for an additional period reasonable under the circumstances (§536-213); use the City''s Request for Permit Amendment/Update, Extension, Renewal or Cancellation form',
+   NULL,
+   'https://us-east-1-indy.graphassets.com/ActDBC5rvRWeCZlNNnLrDz/cmq9ljhkd06ua07llx9fclvja'),
 
   ('Seattle', 'WA', 'Seattle', 'building', 540,
    '18 months from issuance (Seattle Building Code section 106.10)',
@@ -127,7 +147,10 @@ VALUES
    NULL,
    'https://Seattle.gov/documents/Departments/SDCI/Permits/ConstructionPermitRenewals.pdf http://www.seattle.gov/sdci/permits/changes-to-your-issued-permit/building-permit-renewals'),
 
-  ('Denver', 'CO', 'Denver', 'building', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  ('Denver', 'CO', 'Denver', 'building', NULL,
+   'No fixed maximum duration in the 2025 Denver Building Code §131. A construction permit may be voided when work is not commenced within 60 days of issuance, work is suspended or abandoned for 60 days, or no inspection has been requested for 60 days (§131.7). Before work recommences, new plans may be required and a new permit obtained (verified November 24, 2026)',
+   NULL, NULL, NULL, NULL,
+   'https://denvergov.org/files/assets/public/community-planning-and-development/documents/ds/building-codes/2025_denver_building_code.pdf'),
 
   ('Oklahoma City', 'OK', 'Oklahoma City', 'building', NULL, NULL, NULL, NULL, NULL, NULL, NULL)
 ON CONFLICT (city, state_code, permit_type) DO NOTHING;

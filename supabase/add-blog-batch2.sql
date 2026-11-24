@@ -1,6 +1,6 @@
 -- Permit Warden blog seed batch 4: 4 SEO posts targeting shovels.ai competitor keywords (2026-10-18).
 -- Run manually in Supabase SQL editor. Safe to re-run: ON CONFLICT (slug) DO NOTHING.
--- Images already in public/blog/ (<100KB each), referenced as /blog/<file>.jpg in content.
+-- Images already in public/blog/ (<100KB each), referenced as /blog/<file>.webp in content.
 
 INSERT INTO blog_posts (slug, title, excerpt, content, published, published_at, meta_title, meta_description) VALUES
 ('certificate-of-occupancy-guide', 'Certificate of Occupancy: The Complete Guide for Contractors (2026)', 'A certificate of occupancy is the final green light that lets people legally live or work in a building. Here''s everything contractors need to know about getting one — requirements, inspections, timelines, costs, and the mistakes that cause delays.', $$# Certificate of Occupancy: The Complete Guide for Contractors (2026)
@@ -25,7 +25,7 @@ The document itself is usually simple — a page or two listing the property add
 
 ## Why the Certificate of Occupancy Matters So Much
 
-![Certificate of occupancy document beside a completed residential building](/blog/certificate-of-occupancy-guide-1.jpg)
+![Certificate of occupancy document beside a completed residential building](/blog/certificate-of-occupancy-guide-1.webp)
 
 For contractors, the CO matters for reasons that go well beyond paperwork:
 
@@ -91,7 +91,7 @@ Requirements vary by jurisdiction, but you generally need a CO (or an amended CO
 
 ## How to Get a Certificate of Occupancy: Step by Step
 
-![Building inspector reviewing final construction checklist at a job site](/blog/certificate-of-occupancy-guide-2.jpg)
+![Building inspector reviewing final construction checklist at a job site](/blog/certificate-of-occupancy-guide-2.webp)
 
 The process follows a predictable sequence in most jurisdictions. Here's how it typically works:
 
@@ -205,7 +205,7 @@ Short version: nothing good. The consequences escalate quickly:
 
 ## Certificate of Occupancy vs. Other Permits
 
-![Approved stamp on building plans representing certificate of occupancy approval](/blog/certificate-of-occupancy-guide-3.jpg)
+![Approved stamp on building plans representing certificate of occupancy approval](/blog/certificate-of-occupancy-guide-3.webp)
 
 Contractors sometimes confuse the CO with other documents. Here's how they differ:
 
@@ -327,7 +327,7 @@ The AHJ isn't always the building department. Depending on the project and locat
 
 **Homeowners associations (sort of).** HOAs aren't government AHJs, but many enforce architectural review requirements that function like a parallel approval process. You need the HOA's approval *and* the government AHJ's permit.
 
-![Map showing multiple AHJ jurisdictions with boundary markers for contractors](/blog/what-is-ahj-construction-1.jpg)
+![Map showing multiple AHJ jurisdictions with boundary markers for contractors](/blog/what-is-ahj-construction-1.webp)
 
 ## What Does the AHJ Actually Control?
 
@@ -375,7 +375,7 @@ When in doubt, call the building department and ask: "I'm bidding a project at [
 
 Instead of Googling each jurisdiction individually, use the [Permit Warden AHJ directory](/ahj) — 186 building department portals across all 50 states, with direct links to permit applications, inspection scheduling, and fee schedules. Find your AHJ in seconds instead of hunting through government websites.
 
-![Government building department office representing Authority Having Jurisdiction](/blog/what-is-ahj-construction-2.jpg)
+![Government building department office representing Authority Having Jurisdiction](/blog/what-is-ahj-construction-2.webp)
 
 ## The Multi-AHJ Problem (and How to Survive It)
 
@@ -433,7 +433,7 @@ The AHJ isn't your adversary — they're the gatekeeper, and smart contractors t
 
 **Know the appeals process.** Every AHJ has a formal appeals process — usually a board of appeals or similar body. If an inspector's interpretation seems wrong, you have the right to appeal. Know the deadlines and procedures before you need them.
 
-![Contractor submitting permit application to AHJ building official](/blog/what-is-ahj-construction-3.jpg)
+![Contractor submitting permit application to AHJ building official](/blog/what-is-ahj-construction-3.webp)
 
 ## AHJ Differences That Catch Contractors Off Guard
 
@@ -561,7 +561,7 @@ The "right-of-way" typically extends beyond the paved road. It includes sidewalk
 - **Landscaping or fencing** in the parkway
 - **Traffic control** — lane closures for construction access
 
-![Road construction in public right-of-way requiring a right-of-way permit](/blog/permit-types-explained-2.jpg)
+![Road construction in public right-of-way requiring a right-of-way permit](/blog/permit-types-explained-2.webp)
 
 ### How the approval works
 
@@ -687,7 +687,7 @@ Any construction in a FEMA-designated floodplain needs this in addition to the b
 
 Work on locally designated historic structures (or in historic districts) requires approval from a historic preservation commission — often before the building permit can issue. The standards focus on preserving historic character: original windows, compatible materials, appropriate additions. This process is subjective and can be slow.
 
-![Commercial building representing conditional use permit approval process](/blog/permit-types-explained-3.jpg)
+![Commercial building representing conditional use permit approval process](/blog/permit-types-explained-3.webp)
 
 ## How These Permits Interact (The Sequencing Problem)
 
@@ -782,7 +782,7 @@ There's no national APN format. Every county designs its own numbering system, w
 
 **You don't need to decode the APN.** The segments are for the assessor's internal organization. What matters is that you have the complete, correct number — every digit, every hyphen in the right place.
 
-![Property parcel map showing assessor parcel numbers for land divisions](/blog/assessors-parcel-number-guide-1.jpg)
+![Property parcel map showing assessor parcel numbers for land divisions](/blog/assessors-parcel-number-guide-1.webp)
 
 ## How to Find a Parcel Number for Any Property
 
@@ -850,7 +850,7 @@ Water, sewer, gas, and electric utilities all use the APN to identify the servic
 
 When a property is subdivided, each new parcel gets a new APN. When parcels are merged, the old APNs are retired and a new one is issued. **During transitions, the APN may be in flux** — the assessor's records might show the old configuration while the new parcels aren't yet numbered. Always verify the current APN directly with the assessor for recently divided or merged properties.
 
-![Aerial view of divided land parcels with boundary lines marked](/blog/assessors-parcel-number-guide-2.jpg)
+![Aerial view of divided land parcels with boundary lines marked](/blog/assessors-parcel-number-guide-2.webp)
 
 ## Common APN Mistakes That Delay Permits
 
@@ -896,7 +896,7 @@ While every county is different, here are patterns you'll see in major states:
 
 **General rule:** Larger, more populous counties have better online tools. Rural counties may have limited online records — call them. The [Permit Warden AHJ directory](/ahj) can point you to the right county portal.
 
-![Contractor using tablet to look up assessor parcel number on county website](/blog/assessors-parcel-number-guide-3.jpg)
+![Contractor using tablet to look up assessor parcel number on county website](/blog/assessors-parcel-number-guide-3.webp)
 
 ## APN vs. Legal Description vs. Address
 

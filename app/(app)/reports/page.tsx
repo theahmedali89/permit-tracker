@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Card, Badge } from "@/components/ui";
-import { buildReportSummary } from "@/lib/reports";
+import { buildReportSummary } from "@/lib/shared/reports";
 
 export default async function ReportsPage() {
   const supabase = await createClient();
@@ -42,12 +42,20 @@ export default async function ReportsPage() {
             Generated {new Date(summary.generated_at).toLocaleString()}
           </p>
         </div>
-        <a
-          href="/api/reports/summary?format=csv"
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-        >
-          ⬇ Export CSV
-        </a>
+        <div className="flex gap-3">
+          <a
+            href="/api/reports/summary?format=csv"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+          >
+            ⬇ Export CSV
+          </a>
+          <Link
+            href="/reports/risk"
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md"
+          >
+            Risk Report →
+          </Link>
+        </div>
       </div>
 
       <div className="space-y-6">

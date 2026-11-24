@@ -2,6 +2,14 @@
 // Source: ~/workspace/goals/permit-tracker/files/noise-shed-data-phase0.md
 // Verified 2026-11-03 from official city sources. UNVERIFIED fields are null
 // and the UI must render them as "not verified yet". Never invent values here.
+// Update 2026-11-24 (pass 2): the last five null noise fields were filled from
+// official sources (Columbus weekday hours, Indianapolis dB, Seattle dB,
+// Phoenix dB, San Antonio weekend hours — see CONTENT_ENRICHMENT_REPORT.md).
+// San Antonio's weekday hours were also corrected: the clock hours in
+// 21-52(a)(6) were adopted by ordinance passed Feb. 17, 2022 (eff. Feb. 27,
+// 2022), so the old "no clock hours in the adopted code" note no longer
+// applies. No noise field is null any more; the null rendering is kept for
+// future cities.
 
 export const VERIFIED_DATE = "November 3, 2026";
 
@@ -123,10 +131,10 @@ export const CITIES: CityRecord[] = [
       weekdayHours: "8:00 AM - 8:00 PM within 600 ft of a residential building or hospital (MCC 8-32-140)",
       weekendHours: "Same as weekdays - no weekday/weekend split. Emergency work and government work are exempt",
       dbLimits:
-        "No general residential dB cap. Mechanical stationary equipment only: 55 dB(A) at 100+ ft, or 70 dB(A) at 10+ ft, 8 PM - 8 AM",
+        "No general residential dB cap for construction noise (§8-32-140 sets hours only). Mechanical stationary equipment only: 55 dB(A) at 100+ ft, or 70 dB(A) at 10+ ft, 8 PM - 8 AM (§8-32-090)",
       note: null,
-      sourceUrl: "https://decibelshield.app/noise-ordinance/chicago/",
-      sourceLabel: "Municipal Code of Chicago 8-32-140 (quoted verbatim)",
+      sourceUrl: "https://codelibrary.amlegal.com/codes/chicago/latest/chicago_il/0-0-0-2644999",
+      sourceLabel: "Municipal Code of Chicago 8-32-140 (American Legal Publishing); dB limits per §8-32-090",
     },
     shed: {
       exemptUpToSqft: 150,
@@ -151,7 +159,8 @@ export const CITIES: CityRecord[] = [
     stateCode: "OH",
     slug: "columbus-oh",
     noise: {
-      weekdayHours: null,
+      weekdayHours:
+        "No fixed construction hours — Columbus sets no construction-hour rule; Code 2329.11 governs construction noise only by dB limits and audibility rules (verified 2026-11-24)",
       weekendHours: "No weekend/holiday distinction",
       dbLimits:
         "Residential: 65 dBA day (7 AM - 10 PM) / 60 dBA night (1-hour average at the boundary). Amplified sound must not be audible 50 ft beyond the property line",
@@ -317,7 +326,8 @@ export const CITIES: CityRecord[] = [
     noise: {
       weekdayHours: "7:00 AM - 7:00 PM daily (Municode Ch. 391, 391-302)",
       weekendHours: "Same - no weekend/holiday distinction",
-      dbLimits: null,
+      dbLimits:
+        "No general residential dB limit — Indianapolis judges noise by the 'unreasonable noise' standard (§391-302(a)-(b)) and plainly-audible tests (10 PM - 7 AM); the only dB figure in Ch. 391 is 115 dB for vendor-vehicle sound equipment (§391-302(c)(14)) (verified 2026-11-24)",
       note: null,
       sourceUrl:
         "https://library.municode.com/in/indianapolis_-_marion_county/codes/code_of_ordinances?nodeId=TITIIPUORSA_CH391NU_ARTIIINO&utm_source=indytoday&utm_medium=newsletter&utm_term=indytoday&utm_campaign=daily-newsletter&utm_content=indytoday",
@@ -482,7 +492,8 @@ export const CITIES: CityRecord[] = [
         "Seasonal. Winter (Oct 16 - Apr 30): Mon - Fri 7 AM - 7 PM. Summer (May 1 - Oct 15, state law SB 1182): Mon - Fri 5 AM - 7 PM",
       weekendHours:
         "Winter: Sat/Sun/holidays prohibited without an Extended Hours permit. Summer: Sat 7 AM - 7 PM (state law); Sunday locally controlled (prohibited without permit)",
-      dbLimits: null,
+      dbLimits:
+        "No fixed numeric residential dB limit — Phoenix City Code Ch. 23 (§§23-12–23-15) sets no decibel table; it prohibits unreasonably loud and disturbing noise, with 11 PM - 7 AM named as the sensitive period for music, amplified sound and shouting (§23-14(b)-(c)) (verified 2026-11-24)",
       note: null,
       sourceUrl:
         "https://www.phoenix.gov/administration/departments/pdd/tools-resources/complaints/after-hours-construction-noise-complaints.html",
@@ -512,13 +523,14 @@ export const CITIES: CityRecord[] = [
     slug: "san-antonio-tx",
     noise: {
       weekdayHours:
-        "Adopted code: construction only during 'daytime' on weekdays - no clock hours in the adopted code (21-52(a)(6)). Sound must stay at or under 80 dBA at or across any property boundary",
-      weekendHours: null,
+        "Mon - Fri 7:00 AM - 8:00 PM (21-52(a)(6), as amended by ordinance passed Feb. 17, 2022, eff. Feb. 27, 2022). Sound must stay at or under 80 dBA at or across any property boundary",
+      weekendHours:
+        "Saturday 8:00 AM - 8:00 PM; Sunday 9:00 AM - 5:00 PM; no construction on legal holidays (21-52(a)(6), as amended Feb. 17, 2022; DSD IB 244) (verified 2026-11-24)",
       dbLimits: "63 dB residential / 70 business / 72 industrial / 85 entertainment; minus 7 dB at night",
-      note: "Clock hours (7-8 Mon-Fri, 8-8 Sat, 9-5 Sun, no legal holidays) exist only in a proposed amendment - adoption was not verified",
+      note: "Clock hours were added by the Feb. 17, 2022 amendment (eff. Feb. 27, 2022); waivers for off-hours work are available from the Building Official (DSD IB 244)",
       sourceUrl:
-        "https://docsonline.sanantonio.gov/FileUploads/DSD/GoodnightGoodnightConstructionSiteCCR-June82021Meeting.pdf",
-      sourceLabel: "San Antonio DSD construction noise documents",
+        "https://docsonline.sanantonio.gov/DSDUploads/ConstructionNoiseOrdinance-Draft.pdf",
+      sourceLabel: "City of San Antonio, Ordinance amending §21-52(a)(6) (passed 2/17/2022) / DSD IB 244",
     },
     shed: {
       exemptUpToSqft: 300,
@@ -643,7 +655,8 @@ export const CITIES: CityRecord[] = [
     noise: {
       weekdayHours: "7:00 AM - 10:00 PM",
       weekendHours: "9:00 AM - 10:00 PM",
-      dbLimits: null,
+      dbLimits:
+        "Residential source to residential receiver: 55 dB(A) daytime / 45 dB(A) nighttime; commercial source to residential receiver 57 dB(A); industrial source to residential receiver 60 dB(A) (SMC 25.08.410–.420; nighttime 10 PM - 7 AM weekdays, 10 PM - 9 AM weekends/holidays) (verified 2026-11-24)",
       note: null,
       sourceUrl: "https://www.seattle.gov/construction-and-inspections/codes/common-code-questions/noise-codes",
       sourceLabel: "Seattle SDCI noise codes",
@@ -680,12 +693,12 @@ export const CITIES: CityRecord[] = [
     },
     shed: {
       exemptUpToSqft: 50,
-      strictLessThan: true,
+      strictLessThan: false,
       alwaysPermit: false,
       caution: null,
-      detail: "Under 50 sq ft and under 10 ft tall",
-      sourceUrl: "https://www.permitflow.com/blog/dc-building-permit-faq",
-      sourceLabel: "DC DOB guidance via citing sources",
+      detail: "One garden/storage shed that does not exceed 50 sq ft and is under 10 ft tall needs no building permit (outside historic districts; DCRA Building Permit Factsheet)",
+      sourceUrl: "https://app.dcoz.dc.gov/Exhibits/2010/ZC/20-19/Exhibit12.pdf",
+      sourceLabel: "DC Office of Zoning, ZC 20-19 Exhibit 12 (shed definition: ≤50 sq ft, <10 ft)",
     },
     fence: {
       maxHeightFtNoPermit: null,

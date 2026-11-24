@@ -3,6 +3,8 @@ import { redirect, notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Card, Badge } from "@/components/ui";
 import Link from "next/link";
+import { evaluateProjectGate } from "@/lib/features/project-gate";
+import { SubcontractorLinks } from "./subcontractor-links";
 
 export default async function ProjectDetailPage({
   params,
@@ -34,6 +36,24 @@ export default async function ProjectDetailPage({
     .eq("project_id", id)
     .order("created_at", { ascending: false });
 
+  // Project Gate: stop-work risk from linked non-compliant subcontractors.
+  const gate = await evaluateProjectGate(supabase, project.organization_id, id);
+
+  // Subcontractors linked to this project + all org subcontractors
+  // (for the link/unlink controls below).
+  const { data: linkRows } = await supabase
+    .from("project_subcontractors")
+    .select("subcontractor_id")
+    .eq("organization_id", project.organization_id)
+    .eq("project_id", id);
+  const linkedIds = (linkRows ?? []).map((r: any) => r.subcontractor_id);
+  const { data: allSubs } = await supabase
+    .from("subcontractors")
+    .select("id, name, trade")
+    .eq("organization_id", project.organization_id)
+    .order("name");
+  const linkedSubs = (allSubs ?? []).filter((s: any) => linkedIds.includes(s.id));
+
   const statusColor = project.status === "active" ? "green"
     : project.status === "completed" ? "blue"
     : project.status === "on_hold" ? "yellow" : "red";
@@ -56,6 +76,29 @@ export default async function ProjectDetailPage({
           Edit Project
         </Link>
       </div>
+
+      {gate.atRisk && (
+        <div className="mb-6 rounded-lg border border-red-300 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20" role="alert">
+          <p className="font-semibold text-red-800 dark:text-red-300">
+            ⚠ Stop-work risk — a subcontractor on this project is non-compliant
+          </p>
+          <ul className="mt-2 space-y-1 text-sm text-red-700 dark:text-red-200">
+            {gate.risks.map((r) => (
+              <li key={r.subcontractorId}>
+                <Link href="/subcontractors" className="font-medium underline">
+                  {r.name}
+                </Link>
+                {r.trade ? ` (${r.trade})` : ""} — {r.expiredItems.join("; ")}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-red-600 dark:text-red-300">
+            Work with an expired license or COI can void coverage and draw a
+            stop-work order. Renew the subcontractor&apos;s documents before
+            they work on this project.
+          </p>
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-6">
@@ -135,6 +178,15 @@ export default async function ProjectDetailPage({
                 ))}
               </div>
             )}
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Subcontractors on this project</h2>
+            <SubcontractorLinks
+              projectId={project.id}
+              linked={linkedSubs}
+              all={allSubs ?? []}
+            />
           </Card>
 
           <Card className="p-6">

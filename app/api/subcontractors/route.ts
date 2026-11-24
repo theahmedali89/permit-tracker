@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { parsePagination } from "@/lib/shared/validate";
 import { NextRequest, NextResponse } from "next/server";
 
 async function getOrgId(supabase: any, userId: string) {
@@ -11,7 +12,7 @@ async function getOrgId(supabase: any, userId: string) {
   return data?.organization_id;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -19,11 +20,15 @@ export async function GET() {
   const orgId = await getOrgId(supabase, user.id);
   if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
 
+  const { searchParams } = new URL(request.url);
+  const { from, to } = parsePagination(searchParams);
+
   const { data, error } = await supabase
     .from("subcontractors")
     .select("*")
     .eq("organization_id", orgId)
-    .order("name");
+    .order("name")
+    .range(from, to);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);

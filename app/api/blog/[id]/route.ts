@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { isPlatformAdmin } from "@/lib/shared/platform-admin";
 import { NextRequest, NextResponse } from "next/server";
 
 async function requireMember() {
@@ -12,6 +13,28 @@ async function requireMember() {
     .limit(1)
     .single();
   return membership ? supabase : null;
+}
+
+/**
+ * Platform-admin gate for blog writes (2026-11-24) — see
+ * app/api/blog/route.ts. PATCH/DELETE require a real platform admin;
+ * unauthenticated → 401, non-admins → 403. GET is unchanged.
+ */
+async function requirePlatformAdmin(): Promise<
+  { supabase: Awaited<ReturnType<typeof createClient>> } | { status: 401 | 403 }
+> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { status: 401 };
+  if (!(await isPlatformAdmin(user.email))) return { status: 403 };
+  return { supabase };
+}
+
+function adminError(status: 401 | 403) {
+  return NextResponse.json(
+    { error: status === 401 ? "Unauthorized" : "Forbidden: platform admins only" },
+    { status }
+  );
 }
 
 export async function GET(
@@ -30,8 +53,9 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const supabase = await requireMember();
-  if (!supabase) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requirePlatformAdmin();
+  if ("status" in auth) return adminError(auth.status);
+  const supabase = auth.supabase;
   const { id } = await params;
   const body = await request.json();
 
@@ -61,8 +85,9 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const supabase = await requireMember();
-  if (!supabase) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requirePlatformAdmin();
+  if ("status" in auth) return adminError(auth.status);
+  const supabase = auth.supabase;
   const { id } = await params;
   const { error } = await supabase.from("blog_posts").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

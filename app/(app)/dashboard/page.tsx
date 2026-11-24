@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Card, Badge } from "@/components/ui";
+import { smartBufferForPermit } from "@/lib/features/smart-buffer";
+import { getDashboardData } from "@/lib/features/dashboard";
+import { RemoveSampleDataButton } from "./remove-sample-data";
 
 /* ── Inline SVG icons (no emoji) ── */
 
@@ -244,69 +247,19 @@ export default async function DashboardPage() {
   const orgId = membership.organization_id;
   const orgName = (membership as any).organizations?.name ?? "Your organization";
 
-  const [{ count: activeCount }, { count: pendingCount }, { count: expiringCount }, { count: expiredCount }] =
-    await Promise.all([
-      supabase.from("permits").select("*", { count: "exact", head: true }).eq("organization_id", orgId).eq("status", "active"),
-      supabase.from("permits").select("*", { count: "exact", head: true }).eq("organization_id", orgId).eq("status", "pending"),
-      supabase.from("permits").select("*", { count: "exact", head: true }).eq("organization_id", orgId).eq("status", "expiring_soon"),
-      supabase.from("permits").select("*", { count: "exact", head: true }).eq("organization_id", orgId).eq("status", "expired"),
-    ]);
-
-  const [{ data: actionItems }, { data: upcoming }, { data: recentActivity }] = await Promise.all([
-    supabase
-      .from("permits")
-      .select("id, permit_type, permit_number, expiration_date, status, projects(name)")
-      .eq("organization_id", orgId)
-      .in("status", ["expired", "expiring_soon"])
-      .order("expiration_date", { ascending: true })
-      .limit(8),
-    supabase
-      .from("deadlines")
-      .select("id, deadline_type, resource_type, due_date, status")
-      .eq("organization_id", orgId)
-      .eq("status", "pending")
-      .gte("due_date", new Date().toISOString().split("T")[0])
-      .order("due_date", { ascending: true })
-      .limit(8),
-    supabase
-      .from("audit_events")
-      .select("id, action, entity_type, created_at")
-      .eq("organization_id", orgId)
-      .order("created_at", { ascending: false })
-      .limit(8),
-  ]);
-
-  // 6-month expiry forecast (permits + licenses + documents)
-  const todayStr = new Date().toISOString().split("T")[0];
-  const sixMo = new Date();
-  sixMo.setMonth(sixMo.getMonth() + 6);
-  const sixMoStr = sixMo.toISOString().split("T")[0];
-
-  const [{ data: pExp }, { data: lExp }, { data: dExp }] = await Promise.all([
-    supabase.from("permits").select("expiration_date").eq("organization_id", orgId).gte("expiration_date", todayStr).lte("expiration_date", sixMoStr),
-    supabase.from("licenses").select("expiration_date").eq("organization_id", orgId).gte("expiration_date", todayStr).lte("expiration_date", sixMoStr),
-    supabase.from("documents").select("expiry_date").eq("organization_id", orgId).gte("expiry_date", todayStr).lte("expiry_date", sixMoStr),
-  ]);
-
-  const forecast: { label: string; permits: number; licenses: number; documents: number }[] = [];
-  for (let i = 0; i < 6; i++) {
-    const d = new Date();
-    d.setMonth(d.getMonth() + i);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    forecast.push({
-      label: d.toLocaleDateString("en-US", { month: "short" }),
-      permits: (pExp || []).filter((p: any) => p.expiration_date?.startsWith(key)).length,
-      licenses: (lExp || []).filter((l: any) => l.expiration_date?.startsWith(key)).length,
-      documents: (dExp || []).filter((x: any) => x.expiry_date?.startsWith(key)).length,
-    });
-  }
-
-  const totalPermits = (activeCount || 0) + (pendingCount || 0) + (expiringCount || 0) + (expiredCount || 0);
-  // Health weights: expired = 0 pts (critical), expiring_soon = 50 pts (warning but still valid),
-  // active/pending = 100 pts. An expiring permit should never tank health to 0%.
-  const compliance = totalPermits > 0
-    ? Math.round((((activeCount || 0) + (pendingCount || 0) + (expiringCount || 0) * 0.5) / totalPermits) * 100)
-    : 100;
+  // Data fetching lives in the dashboard feature (pass 2 modularity).
+  const {
+    hasSampleData,
+    activeCount,
+    pendingCount,
+    expiringCount,
+    expiredCount,
+    actionItems,
+    upcoming,
+    recentActivity,
+    forecast,
+    compliance,
+  } = await getDashboardData(supabase, orgId);
 
   const todayLabel = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -340,6 +293,7 @@ export default async function DashboardPage() {
               style={{ width: `${compliance}%` }}
             />
           </div>
+          {hasSampleData && <RemoveSampleDataButton />}
         </div>
       </div>
 
@@ -432,6 +386,9 @@ export default async function DashboardPage() {
               {actionItems.map((permit: any) => {
                 const days = permit.expiration_date ? daysUntil(permit.expiration_date) : null;
                 const isExpired = permit.status === "expired";
+                // Smart buffer: show the apply-by date when verified
+                // regulation data exists for this permit's jurisdiction.
+                const buffer = smartBufferForPermit(permit)?.buffer ?? null;
                 return (
                   <Link
                     key={permit.id}
@@ -450,8 +407,12 @@ export default async function DashboardPage() {
                       </p>
                       <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                         {permit.projects?.name ?? "No project"}
-                        {permit.expiration_date && (
-                          <> · {isExpired ? "Expired" : "Expires"} {formatDate(permit.expiration_date)}</>
+                        {buffer ? (
+                          <> · Apply by {formatDate(buffer.applyByDate)}</>
+                        ) : (
+                          permit.expiration_date && (
+                            <> · {isExpired ? "Expired" : "Expires"} {formatDate(permit.expiration_date)}</>
+                          )
                         )}
                       </p>
                     </div>

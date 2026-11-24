@@ -4,24 +4,32 @@ import { useRef, useState } from "react";
 import { Alert, Button } from "@/components/ui";
 
 /**
- * PermitOcrUpload — scan a permit document photo/scan (JPG/PNG) and extract
- * candidate expiry dates + permit numbers to pre-fill the new-permit form.
+ * PermitOcrUpload — scan a permit document photo/scan (JPG/PNG) or PDF and
+ * extract candidate expiry dates + permit numbers to pre-fill the new-permit
+ * form. PDFs are rendered to canvas pages with pdfjs-dist (dynamically
+ * imported, client-side only) and each page runs the same Tesseract pass.
  *
  * PRIVACY BY DESIGN:
  * - OCR runs entirely in the BROWSER via tesseract.js (dynamically imported so
- *   it never bloats the main bundle). The raw image is NEVER uploaded to a
+ *   it never bloats the main bundle). The raw image/PDF is NEVER uploaded to a
  *   server, never persisted anywhere — it lives only in memory and an
  *   object URL that is revoked after processing.
  * - tesseract.js downloads its language model (eng.traineddata) from its CDN
- *   at runtime; only the model fetch leaves the browser, never the image.
+ *   at runtime, and pdf.js fetches its worker script from a CDN; only those
+ *   code fetches leave the browser, never the document.
  *
- * FUTURE: v1 supports images only. PDF support is a planned enhancement
- * (render pages to canvas, e.g. with pdf.js, then run the same OCR pass).
+ * NOTE (plans): AI-powered extraction is a Professional/Business plan
+ * feature in lib/plans.ts (aiExtraction). This browser OCR is free for all
+ * plans; the note below is UI-only and does not gate anything here.
  */
+
+import { REGULATION_DATA } from "@/app/(public)/ahj/_regulations";
 
 export type OcrPrefill = {
   permit_number?: string;
   expiration_date?: string; // ISO YYYY-MM-DD
+  issue_date?: string; // ISO YYYY-MM-DD
+  jurisdiction?: string; // e.g. "Austin, TX"
 };
 
 type DateCandidate = { raw: string; iso: string; labeled: boolean };
@@ -36,6 +44,21 @@ const MONTHS: Record<string, string> = {
 
 const EXPIRY_LABEL = /expir(?:ation|y|es|ed)?|valid\s*(?:thru|through|until|to)|expire[sd]?\s*(?:on|date)?/i;
 const PERMIT_LABEL = /permit\s*(?:no\.?|number|num|#)/i;
+const ISSUE_LABEL = /issu(?:ed|e)?\s*(?:on|date)?|date\s*issued|issued/i;
+const FEE_LABEL = /fee|amount\s*due|total\s*due|amount\s*paid|total/i;
+
+/** One extracted field value with a heuristic confidence (0–100). */
+export type FieldResult = {
+  value: string;
+  confidence: number;
+  labeled: boolean;
+  page: number;
+};
+
+function confidenceFor(ocrConfidence: number, labeled: boolean): number {
+  const base = Math.round(ocrConfidence || 0);
+  return Math.max(0, Math.min(100, labeled ? base : Math.round(base * 0.8)));
+}
 
 function pad(n: string | number) {
   return String(n).padStart(2, "0");
@@ -122,6 +145,52 @@ function extractPermitNumbers(text: string): string[] {
   return found.slice(0, 5);
 }
 
+/** Extract an issue date: dates near an "issued" label (labeled only). */
+function extractIssueDates(text: string): DateCandidate[] {
+  const found = new Map<string, DateCandidate>();
+  const numeric = /\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})\b|\b(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\b/g;
+  let m: RegExpExecArray | null;
+  while ((m = numeric.exec(text))) {
+    const window = text.slice(Math.max(0, m.index - 80), m.index);
+    if (!ISSUE_LABEL.test(window)) continue;
+    const iso = m[4] ? toIso(m[5], m[6], m[4]) : toIso(m[1], m[2], m[3]);
+    if (iso && !found.has(iso)) found.set(iso, { raw: m[0], iso, labeled: true });
+  }
+  return [...found.values()].slice(0, 3);
+}
+
+/** Extract a jurisdiction: a known regulated city named in the text. */
+function extractJurisdiction(text: string): { value: string; labeled: boolean } | null {
+  for (const reg of Object.values(REGULATION_DATA)) {
+    // Prefer an explicit "City of X" mention, then any mention of the city.
+    if (new RegExp(`city\\s+of\\s+${reg.city}`, "i").test(text)) {
+      return { value: `${reg.city}, ${reg.state_code}`, labeled: true };
+    }
+  }
+  for (const reg of Object.values(REGULATION_DATA)) {
+    if (new RegExp(`\\b${reg.city}\\b`, "i").test(text)) {
+      return { value: `${reg.city}, ${reg.state_code}`, labeled: false };
+    }
+  }
+  return null;
+}
+
+/** Extract a fee: a $ amount near a fee/total label. */
+function extractFees(text: string): { value: string; labeled: boolean }[] {
+  const found: { value: string; labeled: boolean }[] = [];
+  const re = /\$\s?([\d,]+(?:\.\d{2})?)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    const window = text.slice(Math.max(0, m.index - 80), m.index);
+    const labeled = FEE_LABEL.test(window);
+    if (!labeled) continue;
+    const value = `$${m[1]}`;
+    if (!found.some((f) => f.value === value)) found.push({ value, labeled });
+    if (found.length >= 3) break;
+  }
+  return found;
+}
+
 export default function PermitOcrUpload({ onExtract }: { onExtract: (v: OcrPrefill) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<ScanState>("idle");
@@ -130,6 +199,61 @@ export default function PermitOcrUpload({ onExtract }: { onExtract: (v: OcrPrefi
   const [fileName, setFileName] = useState("");
   const [dates, setDates] = useState<DateCandidate[]>([]);
   const [numbers, setNumbers] = useState<string[]>([]);
+  const [issueDates, setIssueDates] = useState<DateCandidate[]>([]);
+  const [jurisdictions, setJurisdictions] = useState<FieldResult[]>([]);
+  const [fees, setFees] = useState<FieldResult[]>([]);
+  const [pageConfidence, setPageConfidence] = useState<number | null>(null);
+
+  /** Run Tesseract on one image URL; returns text + overall confidence. */
+  async function ocrImage(imageUrl: string, onProgress: (p: number) => void) {
+    const Tesseract = (await import("tesseract.js")).default;
+    const { data } = await Tesseract.recognize(imageUrl, "eng", {
+      logger: (msg: any) => {
+        if (msg?.status === "recognizing text" && typeof msg?.progress === "number") {
+          onProgress(Math.round(msg.progress * 100));
+        }
+      },
+    } as any);
+    return { text: (data?.text ?? "").trim(), confidence: Number(data?.confidence ?? 0) };
+  }
+
+  /** Render the first pages of a PDF to image URLs (client-side, pdfjs-dist). */
+  async function pdfToImageUrls(file: File): Promise<string[]> {
+    let pdfjs: any;
+    try {
+      pdfjs = await import("pdfjs-dist");
+    } catch {
+      throw new Error("PDF support requires pdfjs-dist — see CHANGELOG_MERGED.md");
+    }
+    // Worker script is fetched from a CDN (same pattern as the Tesseract
+    // language model); the PDF itself never leaves the browser.
+    const cdn = (base: string) =>
+      `${base}/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+    pdfjs.GlobalWorkerOptions.workerSrc = cdn("https://cdn.jsdelivr.net");
+    const buffer = await file.arrayBuffer();
+    let pdf: any;
+    try {
+      pdf = await pdfjs.getDocument({ data: buffer }).promise;
+    } catch {
+      // Fall back to the alternate CDN before giving up.
+      pdfjs.GlobalWorkerOptions.workerSrc = cdn("https://unpkg.com");
+      pdf = await pdfjs.getDocument({ data: buffer }).promise;
+    }
+    const pages = Math.min(3, pdf.numPages);
+    const urls: string[] = [];
+    for (let i = 1; i <= pages; i++) {
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 2 });
+      const canvas = document.createElement("canvas");
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) continue;
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      urls.push(canvas.toDataURL("image/png"));
+    }
+    return urls;
+  }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -137,56 +261,108 @@ export default function PermitOcrUpload({ onExtract }: { onExtract: (v: OcrPrefi
     setError("");
     setDates([]);
     setNumbers([]);
+    setIssueDates([]);
+    setJurisdictions([]);
+    setFees([]);
+    setPageConfidence(null);
 
-    // v1: images only.
-    if (!["image/jpeg", "image/png"].includes(file.type)) {
+    const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+    const isImage = ["image/jpeg", "image/png"].includes(file.type);
+    if (!isPdf && !isImage) {
       setState("error");
-      setError("Please choose a JPG or PNG image. PDF support is coming soon.");
+      setError("Please choose a JPG, PNG or PDF file.");
       return;
     }
     if (file.size > 15 * 1024 * 1024) {
       setState("error");
-      setError("That image is larger than 15 MB. Please use a smaller photo or scan.");
+      setError("That file is larger than 15 MB. Please use a smaller file.");
       return;
     }
 
     setFileName(file.name);
     setState("reading");
-    // Object URL lives in browser memory only; revoked after OCR. Nothing leaves the device.
-    const url = URL.createObjectURL(file);
 
     try {
-      // Dynamic import: tesseract.js + its worker are fetched only when the
-      // user actually scans a document — never part of the main bundle.
-      const Tesseract = (await import("tesseract.js")).default;
+      // Dynamic imports: tesseract.js (+ pdf.js for PDFs) are fetched only
+      // when the user actually scans a document — never part of the main bundle.
+      let imageUrls: string[] = [];
+      let objectUrl: string | null = null;
+      if (isPdf) {
+        imageUrls = await pdfToImageUrls(file);
+        if (imageUrls.length === 0) throw new Error("Could not render any page of this PDF.");
+      } else {
+        // Object URL lives in browser memory only; revoked after OCR. Nothing leaves the device.
+        objectUrl = URL.createObjectURL(file);
+        imageUrls = [objectUrl];
+      }
+
       setState("ocr");
       setProgress(0);
-      const { data } = await Tesseract.recognize(url, "eng", {
-        logger: (msg: any) => {
-          if (msg?.status === "recognizing text" && typeof msg?.progress === "number") {
-            setProgress(Math.round(msg.progress * 100));
-          }
-        },
-      } as any);
+      const allDates: DateCandidate[] = [];
+      const allNumbers: string[] = [];
+      const allIssue: DateCandidate[] = [];
+      const allJuris: FieldResult[] = [];
+      const allFees: FieldResult[] = [];
+      let bestConfidence = 0;
 
-      const text = (data?.text ?? "").trim();
-      if (!text || text.length < 10) {
-        throw new Error("No readable text was found in this image. Try a clearer photo with the document flat and well lit.");
+      for (let pageIdx = 0; pageIdx < imageUrls.length; pageIdx++) {
+        const { text, confidence } = await ocrImage(imageUrls[pageIdx], (p) => {
+          const overall = Math.round(((pageIdx + p / 100) / imageUrls.length) * 100);
+          setProgress(overall);
+        });
+        bestConfidence = Math.max(bestConfidence, confidence);
+        if (!text || text.length < 10) continue;
+
+        for (const d of extractDates(text)) {
+          if (!allDates.some((x) => x.iso === d.iso)) allDates.push(d);
+        }
+        for (const n of extractPermitNumbers(text)) {
+          if (!allNumbers.includes(n)) allNumbers.push(n);
+        }
+        for (const d of extractIssueDates(text)) {
+          if (!allIssue.some((x) => x.iso === d.iso)) allIssue.push(d);
+        }
+        const juris = extractJurisdiction(text);
+        if (juris) {
+          allJuris.push({
+            value: juris.value,
+            labeled: juris.labeled,
+            confidence: confidenceFor(confidence, juris.labeled),
+            page: pageIdx + 1,
+          });
+        }
+        for (const f of extractFees(text)) {
+          allFees.push({
+            value: f.value,
+            labeled: f.labeled,
+            confidence: confidenceFor(confidence, f.labeled),
+            page: pageIdx + 1,
+          });
+        }
       }
 
-      const dateCandidates = extractDates(text);
-      const numberCandidates = extractPermitNumbers(text);
-      if (dateCandidates.length === 0 && numberCandidates.length === 0) {
-        throw new Error("No dates or permit numbers could be recognized. Try a sharper image.");
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+
+      setPageConfidence(bestConfidence);
+      if (
+        allDates.length === 0 &&
+        allNumbers.length === 0 &&
+        allIssue.length === 0 &&
+        allJuris.length === 0 &&
+        allFees.length === 0
+      ) {
+        throw new Error("No dates, permit numbers, jurisdictions or fees could be recognized. Try a sharper image or a text-based PDF.");
       }
-      setDates(dateCandidates);
-      setNumbers(numberCandidates);
+      setDates(allDates.slice(0, 5));
+      setNumbers(allNumbers.slice(0, 5));
+      setIssueDates(allIssue.slice(0, 3));
+      setJurisdictions(allJuris.slice(0, 3));
+      setFees(allFees.slice(0, 3));
       setState("done");
     } catch (err: any) {
       setState("error");
       setError(err?.message ?? "Something went wrong while scanning the document. Please try again.");
     } finally {
-      URL.revokeObjectURL(url);
       if (fileRef.current) fileRef.current.value = "";
     }
   }
@@ -197,16 +373,22 @@ export default function PermitOcrUpload({ onExtract }: { onExtract: (v: OcrPrefi
   function useNumber(n: string) {
     onExtract({ permit_number: n });
   }
+  function useIssueDate(c: DateCandidate) {
+    onExtract({ issue_date: c.iso });
+  }
+  function useJurisdiction(v: string) {
+    onExtract({ jurisdiction: v });
+  }
 
   return (
     <div className="mb-6 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4">
       <input
         ref={fileRef}
         type="file"
-        accept="image/jpeg,image/png"
+        accept="image/jpeg,image/png,application/pdf"
         className="hidden"
         onChange={handleFile}
-        aria-label="Scan permit document (JPG or PNG)"
+        aria-label="Scan permit document (JPG, PNG or PDF)"
       />
       <div className="flex flex-wrap items-center gap-3">
         <Button
@@ -217,7 +399,7 @@ export default function PermitOcrUpload({ onExtract }: { onExtract: (v: OcrPrefi
           {state === "reading" || state === "ocr" ? "Scanning…" : "📄 Scan document"}
         </Button>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          Upload a photo or scan of the permit (JPG/PNG). Text is read in your browser — the image is never uploaded or stored.
+          Upload a photo, scan or PDF of the permit (JPG/PNG/PDF). Text is read in your browser — the file is never uploaded or stored. AI-powered extraction is a Professional/Business plan feature; this browser scan is free for all plans.
         </p>
       </div>
 
@@ -241,6 +423,11 @@ export default function PermitOcrUpload({ onExtract }: { onExtract: (v: OcrPrefi
 
       {state === "done" && (
         <div className="mt-4 space-y-4">
+          {pageConfidence !== null && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              OCR confidence (best page): {pageConfidence}% — per-field confidence is shown below. Check every value before using it.
+            </p>
+          )}
           {dates.length > 0 && (
             <div>
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -263,6 +450,72 @@ export default function PermitOcrUpload({ onExtract }: { onExtract: (v: OcrPrefi
                     >
                       Use this
                     </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {issueDates.length > 0 && (
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Issue date candidates
+              </h3>
+              <ul className="space-y-1">
+                {issueDates.map((c) => (
+                  <li key={c.iso} className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="text-gray-900 dark:text-white font-mono">{c.iso}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      (as printed: {c.raw})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => useIssueDate(c)}
+                      className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      Use this
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {jurisdictions.length > 0 && (
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Jurisdiction candidates
+              </h3>
+              <ul className="space-y-1">
+                {jurisdictions.map((f, i) => (
+                  <li key={`${f.value}-${i}`} className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="text-gray-900 dark:text-white font-medium">{f.value}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      confidence {f.confidence}%{f.page > 1 ? ` · page ${f.page}` : ""}
+                      {f.labeled ? " · labeled" : " · inferred"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => useJurisdiction(f.value)}
+                      className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      Use this
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {fees.length > 0 && (
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Fee candidates
+              </h3>
+              <ul className="space-y-1">
+                {fees.map((f, i) => (
+                  <li key={`${f.value}-${i}`} className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="text-gray-900 dark:text-white font-mono">{f.value}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      confidence {f.confidence}%{f.page > 1 ? ` · page ${f.page}` : ""}
+                    </span>
                   </li>
                 ))}
               </ul>

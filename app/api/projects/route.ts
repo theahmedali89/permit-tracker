@@ -1,115 +1,36 @@
+// Thin route: project logic lives in lib/features/projects.
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { runFeature } from "@/lib/shared/http";
+import { requireAuthOrg } from "@/lib/shared/route-helpers";
+import {
+  createProject,
+  listProjects,
+  updateProject,
+} from "@/lib/features/projects";
 
-async function getOrgId(supabase: any, userId: string) {
-  const { data } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", userId)
-    .limit(1)
-    .single();
-  return data?.organization_id;
-}
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const orgId = await getOrgId(supabase, user.id);
-  if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
-
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("organization_id", orgId)
-    .order("created_at", { ascending: false });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  return runFeature(async () => {
+    const { orgId } = await requireAuthOrg(supabase);
+    return listProjects(supabase, orgId, new URL(request.url).searchParams);
+  });
 }
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const orgId = await getOrgId(supabase, user.id);
-  if (!orgId) return NextResponse.json({ error: "No organization" }, { status: 400 });
-
-  const body = await request.json();
-  const { name, customer, address, city, state, zip, project_type, start_date, expected_completion, notes, status } = body;
-
-  if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 });
-
-  const { data, error } = await supabase
-    .from("projects")
-    .insert({
-      organization_id: orgId,
-      name, customer, address, city, state, zip, project_type,
-      start_date, expected_completion, notes, status: status || "active",
-    })
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  // Audit log
-  await supabase.from("audit_events").insert({
-    organization_id: orgId,
-    actor_id: user.id,
-    action: "project.created",
-    entity_type: "project",
-    entity_id: data.id,
+  return runFeature(async () => {
+    const { user, orgId } = await requireAuthOrg(supabase);
+    const body = await request.json().catch(() => null);
+    return createProject(supabase, orgId, user.id, body);
   });
-
-  return NextResponse.json(data, { status: 201 });
 }
 
 export async function PATCH(request: NextRequest) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const { data: membership } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .limit(1)
-    .single();
-  if (!membership) return NextResponse.json({ error: "No organization" }, { status: 400 });
-
-  const body = await request.json();
-  const { id, ...updates } = body;
-  if (!id) return NextResponse.json({ error: "Project ID required" }, { status: 400 });
-
-  const allowedFields = [
-    "name", "customer", "address", "city", "state", "zip",
-    "project_type", "start_date", "expected_completion", "notes", "status",
-  ];
-  const filtered: Record<string, any> = {};
-  for (const f of allowedFields) {
-    if (updates[f] !== undefined) filtered[f] = updates[f] || null;
-  }
-
-  const { data, error } = await supabase
-    .from("projects")
-    .update(filtered)
-    .eq("id", id)
-    .eq("organization_id", membership.organization_id)
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  await supabase.from("audit_events").insert({
-    organization_id: membership.organization_id,
-    actor_id: user.id,
-    action: "project.updated",
-    entity_type: "project",
-    entity_id: id,
+  return runFeature(async () => {
+    const { user, orgId } = await requireAuthOrg(supabase);
+    const body = await request.json().catch(() => null);
+    return updateProject(supabase, orgId, user.id, body);
   });
-
-  return NextResponse.json(data);
 }

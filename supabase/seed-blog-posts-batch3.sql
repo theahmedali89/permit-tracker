@@ -11,7 +11,7 @@ How a permit expires, what it costs you, and how you recover all depend on your 
 
 ## The 180-Day Rule: Why Most Permits Expire the Same Way
 
-If you take one thing from this article, take this: **most building permits in major U.S. cities expire after 180 days without inspection activity.** Our research across 20 major metros found the 180-day abandonment rule in Los Angeles, Chicago, Phoenix, Philadelphia, San Antonio, Austin, Jacksonville, Fort Worth, Charlotte, and San Francisco — ten of the twenty largest U.S. cities use essentially the same standard.
+If you take one thing from this article, take this: **most building permits in major U.S. cities expire after 180 days without inspection activity.** Our research across 20 major metros found the 180-day abandonment rule in Chicago, Phoenix, Philadelphia, San Antonio, Austin, Jacksonville, Fort Worth, Charlotte, and San Francisco — nine of the twenty largest U.S. cities use essentially the same standard. Los Angeles is the exception: its permits are valid for two years under LAMC §98.0602.
 
 The rule works like this: once a permit is issued, the clock starts. If 180 days pass with no inspection activity — no passed inspections, no scheduled inspections, nothing in the record showing progress — the building department can declare the permit expired or abandoned. The permit doesn't send you a warning. It simply lapses.
 
@@ -98,7 +98,19 @@ Generally, yes — the current owner and their contractor inherit the permit sta
 
 Every consequence in this article — the fines, the stop-work order, the reapplication — is downstream of a single failure: nobody was watching the date. That's a systems problem, and systems are fixable.
 
-[Permit Warden](/signup) tracks every permit's expiration date alongside your licenses and inspections, with automatic reminders before anything lapses. Set it up once, and the 180-day clock never catches you by surprise again.$$, TRUE, NOW(), 'What Happens When a Building Permit Expires? Consequences & Recovery', 'A building permit expiration means work must stop. Real fine figures, the 180-day rule, stop-work orders, and the step-by-step recovery process for contractors.'),
+[Permit Warden](/signup) tracks every permit's expiration date alongside your licenses and inspections, with automatic reminders before anything lapses. Set it up once, and the 180-day clock never catches you by surprise again.
+
+## Sources
+
+Sources verified November 24, 2026. The 180-day rule and the penalty figures below are each sourced from the official publication named. Note: the reinstatement examples for Chicago, Seattle and Philadelphia in the FAQ above are not yet verified against an official source — confirm with the relevant building department before relying on them.
+
+- [International Code Council, 2021 I-Codes: Application and Administration (Section 105.5, Expiration of Permit)](https://www.iccsafe.org/wp-content/uploads/Session-146-2021-Application-and-Administration-of-the-I-Codes.pdf) — the model-code root of the 180-day rule: a permit becomes invalid unless work commences within 180 days of issuance, or is suspended or abandoned for 180 days; the building official may grant one or more written extensions of up to 180 days each.
+- [NYC DOB/ECB Buildings Penalty Schedule (PDF)](https://www.nyc.gov/html/ecb/downloads/pdf/BuildingsPenaltySchedule.pdf) — building violations $800–$4,000 per violation (Class 2).
+- [Baltimore City Building Code §114](https://codes.baltimorecity.gov/us/md/cities/baltimore/code/building-codes/II/114) — civil fines up to $500 per day, each day a separate offense.
+- [Los Angeles Municipal Code §98.0602 (American Legal Publishing)](https://codelibrary.amlegal.com/codes/los_angeles/latest/lamc/0-0-0-190414) — Los Angeles permits valid 2 years from issuance.
+- [2025 Denver Building Code §131.7 (City and County of Denver, PDF)](https://denvergov.org/files/assets/public/community-planning-and-development/documents/ds/building-codes/2025_denver_building_code.pdf) — a Denver construction permit may be voided when work is not commenced within 60 days of issuance, suspended or abandoned for 60 days, or no inspection is requested for 60 days.
+- [Permit Warden, How Long Is a Building Permit Valid? 20 Major US Cities Compared](/blog/building-permit-validity-by-city) — our 20-city comparison table, built from verified municipal sources.
+$$, TRUE, NOW(), 'What Happens When a Building Permit Expires? Consequences & Recovery', 'A building permit expiration means work must stop. Real fine figures, the 180-day rule, stop-work orders, and the step-by-step recovery process for contractors.'),
 ('building-permit-validity-by-city', 'How Long Is a Building Permit Valid? 20 Major US Cities Compared', 'Building permit validity compared across 20 major US metros — from New York''s 730 days to the 180-day standard most cities use. Real data from municipal sources.', $$# How Long Is a Building Permit Valid? 20 Major US Cities Compared
 
 "How long is a building permit valid?" has no national answer. Every city and county sets its own rules. But after researching the actual building codes and permit documents of the 20 largest U.S. metros, a clear picture emerges — and it's more consistent than most contractors expect.
@@ -110,12 +122,12 @@ Below is the comparison table, built from verified municipal sources. Where we c
 | City | State | Permit Validity | Extension Available |
 |------|-------|----------------|---------------------|
 | New York | NY | 730 days (2 years max) | Yes — renew ~2 weeks before expiration; $130 renewal fee |
-| Los Angeles | CA | 180 days of inactivity | Varies — not verified |
+| Los Angeles | CA | 2 years; expires 12 mo no-start / 12 mo suspended | Yes — file within 30 days via Form 41a/42; 6-month extensions |
 | Chicago | IL | 180 days to begin work / first inspection | Yes — up to 2×180-day extensions pre-construction, 4×180 post-start; 720-day max |
 | Houston | TX | 730 days (2 years); void on 180th inactive day | Yes — 180-day extensions, written request with cause |
 | Phoenix | AZ | 180 days without start or progress | Yes — one-time 90-day extension + one-time 90-day reinstatement |
 | Philadelphia | PA | 180 days; 5-year max for construction permits | Yes — up to 2 extensions to commence, 1 for suspended work; expired permits need a new application |
-| San Antonio | TX | 180 days without activity | Yes — extension form exists; details vary |
+| San Antonio | TX | 180 days without activity | Yes — one or more 180-day extensions for a justifiable reason |
 | San Diego | CA | 365 days (1-year utilization period) | Yes — Form DS-117, up to 180 days plus one additional extension |
 | Dallas | TX | Varies — not verified | Varies — not verified |
 | San Jose | CA | 365 days from issuance | Yes — first extension 180 days; second up to 360 days via letter to Chief Building Official |
@@ -125,7 +137,7 @@ Below is the comparison table, built from verified municipal sources. Where we c
 | Columbus | OH | 365 days to begin; no 6-month gaps once started | Yes — limited extensions; contact the city's expired-permits desk |
 | Charlotte | NC | 180 days (6 months) | Varies — not verified |
 | San Francisco | CA | 180 days suspended/abandoned | Yes — service request form; second extension needs a letter to the Chief Building Inspector |
-| Indianapolis | IN | Varies — not verified | Yes — extension form exists; details vary |
+| Indianapolis | IN | 365 days to begin; 365 days no construction once started | Yes — good-cause written extension, reasonable additional period |
 | Seattle | WA | 540 days (18 months) | Yes — renew up to 30 days before expiration; expired under 1 year can be reestablished |
 | Denver | CO | Varies — not verified | Varies — not verified |
 | Oklahoma City | OK | Varies — not verified | Varies — not verified |
@@ -142,7 +154,7 @@ A few cities add a third element — an overall duration cap regardless of progr
 
 ## The 180-Day Majority
 
-Count the table and the pattern is unmistakable: **ten of the twenty cities run on 180 days.** Los Angeles, Chicago, Phoenix, Philadelphia, San Antonio, Austin, Jacksonville, Fort Worth, Charlotte, and San Francisco all use the 180-day standard for inactivity or abandonment.
+Count the table and the pattern is unmistakable: **nine of the twenty cities run on 180 days.** Chicago, Phoenix, Philadelphia, San Antonio, Austin, Jacksonville, Fort Worth, Charlotte, and San Francisco all use the 180-day standard for inactivity or abandonment.
 
 This isn't coincidence. Most U.S. building codes descend from the same model-code language, and the 180-day abandonment provision is one of the most widely adopted sections. The practical consequence: if you work in multiple cities and only remember one number, 180 days is the one — but always confirm, because the cities that differ (New York's 730, Seattle's 540, San Diego's 365) differ substantially.
 
@@ -170,7 +182,7 @@ The universal advice across all twenty: **request extensions before expiration, 
 
 ## Where the Data Isn't Available
 
-Four cities in the table show "varies — not verified": Dallas, Denver, and Oklahoma City, where we could not confirm validity rules from official municipal sources, and Indianapolis, where only the existence of an extension form could be verified. Three more — Los Angeles, Jacksonville, and Charlotte — have verified validity periods but unverified extension processes.
+Three cities in the table show "varies — not verified": Dallas, Denver, and Oklahoma City, where we could not confirm validity rules from official municipal sources. Indianapolis now has a verified 365-day validity (Code §536-213). Two more — Jacksonville and Charlotte — have verified validity periods but unverified extension processes; Los Angeles has a verified 2-year validity and a verified extension process (LAMC §98.0602).
 
 This isn't a gap in the table; it's the honest state of public permit data. Many building departments publish validity rules deep inside PDFs, council packets, or newsletter archives rather than on clean web pages. When a city's rules aren't published clearly, call the permits division directly — and get the answer in writing.
 
@@ -254,7 +266,7 @@ This is where policies diverge most. Some cities are forgiving; some aren't.
 **The "it depends" ones:**
 
 - **Columbus** allows limited extensions under the building code and maintains a dedicated expired-permits contact (ExpiredPermits@columbus.gov) — the existence of that desk tells you reinstatement is a routine conversation there.
-- **San Antonio** and **Indianapolis** both have extension forms, though the full process details weren't verifiable from official sources — call and ask.
+- **San Antonio** (one or more 180-day extensions for a justifiable reason) and **Indianapolis** (good-cause written extension) both have verified extension processes — see the table above.
 
 ### Path 3: Full reapplication (starting over)
 
@@ -337,5 +349,21 @@ Don't count on it. Most AHJs do not send courtesy reminders — the expiration t
 
 Reinstatement is always harder than prevention. Every path in this guide — the forms, the fees, the waiting, the risk of reapplication under a new code — disappears if the expiration never happens.
 
-[Permit Warden](/signup) watches every permit deadline for you: validity terms logged at issuance, automatic reminders at 30, 14, 7, and 1 day out, and inspection tracking across every jurisdiction you work in. The extension request stays a one-form errand instead of becoming a recovery project.$$, TRUE, NOW(), 'How to Reinstate an Expired Building Permit: City-by-City Guide', 'Expired permit? Learn the three recovery paths — extension, reinstatement, reapplication — with real city policies, fees, and the documents you need.')
+[Permit Warden](/signup) watches every permit deadline for you: validity terms logged at issuance, automatic reminders at 30, 14, 7, and 1 day out, and inspection tracking across every jurisdiction you work in. The extension request stays a one-form errand instead of becoming a recovery project.
+
+## Sources
+
+Sources verified November 24, 2026. Every city figure in the table in this guide comes from that city’s own official publication, listed below. Fees and processes change — confirm with the AHJ before filing.
+
+- [International Code Council, 2021 I-Codes: Application and Administration (Section 105.5, Expiration of Permit)](https://www.iccsafe.org/wp-content/uploads/Session-146-2021-Application-and-Administration-of-the-I-Codes.pdf) — the model-code root of the 180-day rule: a permit becomes invalid unless work commences within 180 days of issuance, or is suspended or abandoned for 180 days; the building official may grant one or more written extensions of up to 180 days each.
+- [NYC Department of Buildings, Permit Renewal](https://www.nyc.gov/site/buildings/property-or-business-owner/permit-renewal.page) — New York permits valid up to 2 years; renew online via DOB NOW:Build about 2 weeks before expiration; $130 renewal fee.
+- [City of Chicago, Building Code Modernization Q&A (PDF)](https://www.chicago.gov/content/dam/city/depts/bldgs/general/CodeModernization/07242020codeQandA.pdf) — Chicago permit validity and extension rules.
+- [City of San Diego, Information Bulletin 117](https://www.sandiego.gov/development-services/forms-publications/information-bulletin/117) — one-year utilization period; Form DS-117 filed at least 1 month before the end of the period; up to 180 days plus one additional extension.
+- [City of Austin, Apply for a Standalone Permit](https://www.austintexas.gov/development-services/apply-standalone-permit) — Austin permit application and extension process.
+- [City of Fort Worth, Council Packet ZC-16-035 (PDF)](https://apps.fortworthtexas.gov/council_packet/render_file.asp?filename=Zoning_cases/3713/ZC-16-035.pdf) — building permits expire 180 days from issuance unless work has begun or an extension is requested (City building code Sec. 105.5); a permit shall not extend more than once when no work has proceeded.
+- [City of Houston, Permitting Center (PDF)](https://www.houstonpermittingcenter.org/media/9056/download) — Houston permit validity and extension rules.
+- [City of San José, Building Permit document](https://www.sanjoseca.gov/home/showpublisheddocument/25887/636965525550970000) — permits expire 12 months from issuance or 180 days from last inspection approval; first extension adds 180 days.
+- [City of San Antonio, Permit Process](https://www.sa.gov/Directory/Departments/DSD/Constructing/Business-Commercial/Permit-Process) — permits expire within 180 days with no proof of work or progress; one or more 180-day extensions for a valid, justifiable reason.
+- [City of Indianapolis, Request for Permit Amendment/Update, Extension, Renewal or Cancellation (official form)](https://us-east-1-indy.graphassets.com/ActDBC5rvRWeCZlNNnLrDz/cmq9ljhkd06ua07llx9fclvja) — the City’s extension form.
+$$, TRUE, NOW(), 'How to Reinstate an Expired Building Permit: City-by-City Guide', 'Expired permit? Learn the three recovery paths — extension, reinstatement, reapplication — with real city policies, fees, and the documents you need.')
 ON CONFLICT (slug) DO NOTHING;

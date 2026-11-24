@@ -95,7 +95,15 @@ export default async function SignUpPage({
             Create free account
           </button>
           <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-500">
-            By signing up you agree to our Terms of Service and Privacy Policy.
+            By signing up you agree to our{" "}
+            <Link href="/terms" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+              Privacy Policy
+            </Link>
+            .
           </p>
         </form>
       </AuthLayout>

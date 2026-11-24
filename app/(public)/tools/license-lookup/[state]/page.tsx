@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LICENSE_BOARDS, type LicenseBoard } from "@/lib/license-boards";
+import { LICENSE_BOARDS, type LicenseBoard } from "@/lib/shared/license-boards";
 import { STATE_NAMES, stateSlug, stateCodeFromSlug } from "../../../ahj/_lib";
 
 export function generateStaticParams() {
@@ -137,6 +137,9 @@ export default async function LicenseLookupStatePage({
             </a>
             <p className="mt-3 break-all text-xs text-gray-500 dark:text-gray-400">
               {board.lookupUrl}
+            </p>
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              Lookup links verified October 20, 2026.
             </p>
           </section>
 

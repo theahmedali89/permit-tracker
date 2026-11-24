@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CookieConsent } from "@/components/cookie-consent";
+import { SwRegister } from "@/components/sw-register";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,7 +58,6 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   manifest: "/manifest.json",
-  themeColor: "#2563eb",
   icons: {
     icon: [
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
@@ -67,7 +67,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const orgLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -84,23 +88,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-B6NM5BZYKJ"
-          strategy="afterInteractive"
-        />
-        <Script id="ga4-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-B6NM5BZYKJ');
-          `}
-        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }}
         />
         <ThemeProvider>{children}</ThemeProvider>
+        <CookieConsent />
+        <SwRegister />
       </body>
     </html>
   );

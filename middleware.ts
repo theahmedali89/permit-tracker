@@ -1,6 +1,27 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// NOTE (Next.js 16): `middleware.ts` is deprecated in favour of
+// `proxy.ts`, but this file is intentionally kept as `middleware.ts`
+// for now — the auth/cookie handling here is unchanged and renaming
+// is a separate migration. Revisit when upgrading past Next 16.
+
+// Protected routes: every authenticated app section. Pages also guard
+// themselves (see app/(app)/layout.tsx), this is defence in depth.
+const protectedPaths = [
+  "/dashboard",
+  "/projects",
+  "/permits",
+  "/licenses",
+  "/inspections",
+  "/calendar",
+  "/reports",
+  "/directory",
+  "/subcontractors",
+  "/settings",
+  "/onboarding",
+];
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -27,8 +48,9 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Protected routes: /dashboard, /projects, /permits, /settings
-  const protectedPaths = ["/dashboard", "/projects", "/permits", "/settings"];
+  // Protected routes: /dashboard, /projects, /permits, /licenses,
+  // /inspections, /calendar, /reports, /directory, /subcontractors,
+  // /settings, /onboarding
   const isProtected = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   );

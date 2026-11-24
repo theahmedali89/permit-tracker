@@ -9,7 +9,7 @@ The exact consequences, recovery options, and costs vary by jurisdiction. Your l
 
 ## Why a Permit Can Expire Before Inspection Ever Happens
 
-![Building permit document beside an hourglass with sand running out](/blog/permit-expired-inspection-1.jpg)
+![Building permit document beside an hourglass with sand running out](/blog/permit-expired-inspection-1.webp)
 
 It sounds strange — how can a permit run out before anyone even inspects the work? — but it happens to contractors regularly, and usually for unremarkable reasons. Building permits are time-limited authorizations. Most AHJs attach two kinds of clocks to them: a commencement window (work must start within a set period after issuance) and a progress or abandonment window (once started, work must show continued progress, typically evidenced by passed inspections at reasonable intervals).
 
@@ -36,7 +36,7 @@ The single most useful thing you can do is check the permit's current status in 
 
 ## The Immediate Consequences
 
-![Construction site halted with a stop barrier at the entrance of a half-built house](/blog/permit-expired-inspection-2.jpg)
+![Construction site halted with a stop barrier at the entrance of a half-built house](/blog/permit-expired-inspection-2.webp)
 
 Once a permit has expired, the consequences land in a fairly predictable order:
 
@@ -135,6 +135,16 @@ It varies enormously: a simple reinstatement can move in days where the AHJ allo
 An expired permit is one of the most expensive preventable problems in construction — and it's preventable with nothing more exotic than writing the dates down and setting reminders. The contractors who never face this situation aren't luckier; they just have a system.
 
 [Permit Warden](/signup) is that system: every permit, license, and inspection in one dashboard, with automatic renewal reminders before anything expires. Set it up once, and never discover a lapsed permit again.
+
+## Sources
+
+Sources verified November 24, 2026. The expiration rule below comes from the model building code; the penalty figures are each city’s published schedule.
+
+- [International Code Council, 2021 I-Codes: Application and Administration (Section 105.5, Expiration of Permit)](https://www.iccsafe.org/wp-content/uploads/Session-146-2021-Application-and-Administration-of-the-I-Codes.pdf) — the model-code root of the 180-day rule: a permit becomes invalid unless work commences within 180 days of issuance, or is suspended or abandoned for 180 days; the building official may grant one or more written extensions of up to 180 days each.
+- [NYC DOB/ECB Buildings Penalty Schedule (PDF)](https://www.nyc.gov/html/ecb/downloads/pdf/BuildingsPenaltySchedule.pdf) — building violations $800–$4,000 per violation (Class 2).
+- [Baltimore City Building Code §114](https://codes.baltimorecity.gov/us/md/cities/baltimore/code/building-codes/II/114) — civil fines up to $500 per day, each day a separate offense.
+- [Municipal Code of Chicago, Construction Codes Table 14A-12-1203.1 (American Legal Publishing)](https://codelibrary.amlegal.com/codes/chicago/latest/chicago_il/0-0-0-2661915) — fines up to $1,000 per day, escalating to $10,000 for repeat violations.
+- [Permit Warden, How Long Is a Building Permit Valid? 20 Major US Cities Compared](/blog/building-permit-validity-by-city) — our 20-city comparison table, built from verified municipal sources.
 $$, TRUE, NOW(), 'What Happens When a Building Permit Expires Before Inspection', 'A building permit that expires before inspection means work must stop. Learn the consequences, reinstatement vs reapplication, code risks, and recovery steps.'),
 ('how-to-extend-expired-building-permit', 'How to Extend an Expired Building Permit', 'An expired building permit can sometimes be extended, renewed, or reissued — but the process, fees, and eligibility vary by jurisdiction. This step-by-step guide covers extensions, renewals, and reapplications.', $$# How to Extend an Expired Building Permit
 
@@ -144,7 +154,7 @@ This guide walks through the full process: how to check your options, the differ
 
 ## Extension vs. Renewal vs. Reapplication: Know the Difference
 
-![Clipboard with permit renewal paperwork, pencil, and approval seal](/blog/extend-permit-1.jpg)
+![Clipboard with permit renewal paperwork, pencil, and approval seal](/blog/extend-permit-1.webp)
 
 Contractors use these words interchangeably, but building departments often don't — and the distinction determines what you need to do:
 
@@ -215,7 +225,7 @@ One practical tip: ask about the timeline explicitly when you submit, and ask wh
 
 ## If the Permit Already Expired: Reinstatement Realities
 
-![Desk calendar with circled date beside a stack of renewal paperwork](/blog/extend-permit-2.jpg)
+![Desk calendar with circled date beside a stack of renewal paperwork](/blog/extend-permit-2.webp)
 
 There's a meaningful difference between requesting an extension *before* expiration and seeking renewal *after* it, and contractors should understand both:
 
@@ -280,6 +290,18 @@ Transfer policies vary. Some AHJs allow permit transfers with the owner's consen
 The difference between a routine extension and a painful reapplication is usually just awareness — knowing the date, and acting before it passes. That's a systems problem, not a competence problem, and systems are fixable.
 
 [Permit Warden](/signup) tracks every permit's expiration alongside your licenses and inspections, with automatic reminders at 30, 14, 7, and 1 day out. Request the extension while it's still easy — the dashboard makes sure you know when.
+
+## Sources
+
+Sources verified November 24, 2026. Extension rules start from the model code and are then set city by city — the sources below are the official publication for each city named in this guide.
+
+- [International Code Council, 2021 I-Codes: Application and Administration (Section 105.5, Expiration of Permit)](https://www.iccsafe.org/wp-content/uploads/Session-146-2021-Application-and-Administration-of-the-I-Codes.pdf) — the model-code root of the 180-day rule: a permit becomes invalid unless work commences within 180 days of issuance, or is suspended or abandoned for 180 days; the building official may grant one or more written extensions of up to 180 days each.
+- [Florida Building Code, 8th Edition (2023), Ch. 1, §105.5 (as reproduced in the City of Palm Bay local amendments, Florida Building Commission)](https://www.floridabuilding.org/Upload/FBC/CodeID_7672_679f_City%20of%20Palm%20Bay%20Local%20Amend%202020%20FBC-Bldg%20Ch%201%20annotated%202021-0910.pdf) — permits become invalid unless work commences within 180 days, or is suspended or abandoned for 180 days.
+- [NYC Department of Buildings, Permit Renewal](https://www.nyc.gov/site/buildings/property-or-business-owner/permit-renewal.page) — New York permits valid up to 2 years; renew online via DOB NOW:Build about 2 weeks before expiration; $130 renewal fee.
+- [Los Angeles Department of Building and Safety, Permit extensions](https://dbs.lacity.gov/node/4081) — file within 30 days of expiration via Form 41a/42; each extension 6 months within the 2-year limit.
+- [City of San Antonio, Permit Process](https://www.sa.gov/Directory/Departments/DSD/Constructing/Business-Commercial/Permit-Process) — permits expire within 180 days with no proof of work or progress; one or more 180-day extensions for a valid, justifiable reason.
+- [City of Jacksonville, Building Inspection Division FAQs](https://www.jacksonville.gov/departments/public-works/building-inspection-division/faqs) — “HOW LONG ARE PERMITS GOOD FOR? 180 days.”
+- [City of Indianapolis, Request for Permit Amendment/Update, Extension, Renewal or Cancellation (official form)](https://us-east-1-indy.graphassets.com/ActDBC5rvRWeCZlNNnLrDz/cmq9ljhkd06ua07llx9fclvja) — the City’s extension form.
 $$, TRUE, NOW(), 'How to Extend an Expired Building Permit: Contractor Guide', 'Can you extend an expired building permit? Step-by-step guide to extensions, renewals, reinstatement, fees, and reapplication — with jurisdiction variations explained.'),
 ('building-permit-validity-periods-explained', 'Building Permit Validity Periods Explained', 'How long is a building permit valid? It depends on your jurisdiction — but most permits run on two or three separate clocks. Learn how validity periods work and how to track them.', $$# Building Permit Validity Periods Explained
 
@@ -289,7 +311,7 @@ That said, most U.S. jurisdictions build their validity periods from the same ba
 
 ## The Direct Answer: Permits Run on Multiple Clocks
 
-![Calendar timeline with milestone markers showing permit validity periods](/blog/permit-validity-1.jpg)
+![Calendar timeline with milestone markers showing permit validity periods](/blog/permit-validity-1.webp)
 
 A building permit's validity isn't usually a single expiration date. Most permits are governed by **two or three overlapping time limits**, and the permit expires when *any one of them* runs out:
 
@@ -313,7 +335,7 @@ The practical takeaway: when the permit is issued, the clock is already running,
 
 ## Clock 2: The Progress / Abandonment Rule
 
-![Hourglass resting on rolled architectural blueprints](/blog/permit-validity-2.jpg)
+![Hourglass resting on rolled architectural blueprints](/blog/permit-validity-2.webp)
 
 Once work has commenced, the second clock takes over. This is the rule that says a permit can't sit idle indefinitely: if work stops showing progress for longer than the allowed window, the AHJ may declare the permit abandoned or expired.
 
@@ -418,6 +440,18 @@ The clocks keep running regardless of who holds the project. If you take over a 
 Commencement windows, abandonment rules, duration caps — multiplied across building permits, trade permits, and phases, multiplied again across every AHJ you work in. Nobody tracks all of that reliably in their head.
 
 [Permit Warden](/signup) does it for you: every permit's validity terms logged at issuance, automatic reminders before any clock runs out, and inspection tracking that doubles as progress evidence. Know every deadline, on every job, without thinking about it.
+
+## Sources
+
+Sources verified November 24, 2026. The common 180-day rule comes from the model building code (and Florida’s adoption of it); the exceptions below are each city’s own code.
+
+- [International Code Council, 2021 I-Codes: Application and Administration (Section 105.5, Expiration of Permit)](https://www.iccsafe.org/wp-content/uploads/Session-146-2021-Application-and-Administration-of-the-I-Codes.pdf) — the model-code root of the 180-day rule: a permit becomes invalid unless work commences within 180 days of issuance, or is suspended or abandoned for 180 days; the building official may grant one or more written extensions of up to 180 days each.
+- [Florida Building Code, 8th Edition (2023), Ch. 1, §105.5 (as reproduced in the City of Palm Bay local amendments, Florida Building Commission)](https://www.floridabuilding.org/Upload/FBC/CodeID_7672_679f_City%20of%20Palm%20Bay%20Local%20Amend%202020%20FBC-Bldg%20Ch%201%20annotated%202021-0910.pdf) — permits become invalid unless work commences within 180 days, or is suspended or abandoned for 180 days.
+- [Los Angeles Municipal Code §98.0602 (American Legal Publishing)](https://codelibrary.amlegal.com/codes/los_angeles/latest/lamc/0-0-0-190414) — Los Angeles permits valid 2 years from issuance.
+- [NYC Department of Buildings, Permit Renewal](https://www.nyc.gov/site/buildings/property-or-business-owner/permit-renewal.page) — New York permits valid up to 2 years; renew online via DOB NOW:Build about 2 weeks before expiration; $130 renewal fee.
+- [2025 Denver Building Code §131.7 (City and County of Denver, PDF)](https://denvergov.org/files/assets/public/community-planning-and-development/documents/ds/building-codes/2025_denver_building_code.pdf) — a Denver construction permit may be voided when work is not commenced within 60 days of issuance, suspended or abandoned for 60 days, or no inspection is requested for 60 days.
+- [City of Dallas, Planning & Development Guide](https://dallascityhall.com/departments/sustainabledevelopment/guide/Pages/default.aspx) — Dallas permits expire after 2 years from issuance, or after 120 days of no inspection activity, whichever comes first; extensions $200 for issued permits.
+- [Indianapolis Code of Ordinances §536-213, Expiration of building permits by operation of law; extensions (full text as published in the Municode code)](https://corpuslaw.us/city/IN-INDIANAPOLIS/ordinances/536-213-expiration-of-building-permits-by-operation) — 365 days to commence, 365 days of substantially no construction once started; good-cause written extension. Text corroborated 2026-11-24 against two independent mirrors of the current Municode-published code; direct library.municode.com access was blocked (HTTP 403) on 2026-11-24.
 $$, TRUE, NOW(), 'Building Permit Validity Periods Explained for Contractors', 'How long is a building permit valid? The commencement, progress & duration clocks explained — plus how validity varies by jurisdiction and how to track it.'),
 ('why-contractors-miss-permit-renewal-deadlines', 'Why Contractors Miss Permit Renewal Deadlines (and How to Stop)', 'Contractors don''t miss permit renewal deadlines from carelessness — they miss them because the system is genuinely hard to track manually. Here are the real reasons, and the system that fixes them.', $$# Why Contractors Miss Permit Renewal Deadlines (and How to Stop It)
 
@@ -427,7 +461,7 @@ This post breaks down the real reasons deadlines get missed, what those misses a
 
 ## The Direct Answer: It's a Systems Problem, Not a People Problem
 
-![Contractor in hard hat checking a phone notification at a construction site](/blog/contractor-missed-deadline-1.jpg)
+![Contractor in hard hat checking a phone notification at a construction site](/blog/contractor-missed-deadline-1.webp)
 
 If missed renewals were about individual diligence, the pattern would be random — a few disorganized contractors missing deadlines here and there. Instead, missed permit deadlines are *common across the industry*, including among well-run companies. That pattern points to a structural cause: the way permit deadlines work is fundamentally mismatched with the way contractors work.
 
@@ -514,7 +548,7 @@ Add it up, and a single missed deadline routinely costs more — in money, time,
 
 ## The System That Stops It: Five Habits
 
-![Dashboard with reminder bells and permit document cards](/blog/contractor-missed-deadline-2.jpg)
+![Dashboard with reminder bells and permit document cards](/blog/contractor-missed-deadline-2.webp)
 
 The good news: the fix isn't complicated, and it doesn't require becoming a different kind of person. It requires a system with five components:
 
@@ -569,5 +603,13 @@ Software doesn't prevent anything by itself — but software that logs every per
 Every reason in this post comes down to one thing: permit deadlines were being tracked by human attention in an industry that consumes all of it. The fix is to move the job from brains to a system — one that logs, reminds, and never gets too busy to check.
 
 [Permit Warden](/signup) was built for exactly this: every permit, license, and inspection in one dashboard, with automatic renewal reminders at 30, 14, 7, and 1 day out. Set it up once — and let the system remember, so you don't have to.
+
+## Sources
+
+Sources verified November 24, 2026. The seven reasons in this post are process observations from working across jurisdictions, not sourced figures. The deadline rules they refer to come from the sources below.
+
+- [International Code Council, 2021 I-Codes: Application and Administration (Section 105.5, Expiration of Permit)](https://www.iccsafe.org/wp-content/uploads/Session-146-2021-Application-and-Administration-of-the-I-Codes.pdf) — the model-code root of the 180-day rule: a permit becomes invalid unless work commences within 180 days of issuance, or is suspended or abandoned for 180 days; the building official may grant one or more written extensions of up to 180 days each.
+- [Permit Warden, How Long Is a Building Permit Valid? 20 Major US Cities Compared](/blog/building-permit-validity-by-city) — our 20-city comparison table, built from verified municipal sources.
+- [NYC Department of Buildings, Permit Renewal](https://www.nyc.gov/site/buildings/property-or-business-owner/permit-renewal.page) — New York permits valid up to 2 years; renew online via DOB NOW:Build about 2 weeks before expiration; $130 renewal fee.
 $$, TRUE, NOW(), 'Why Contractors Miss Permit Renewal Deadlines (and How to Stop)', 'Why do contractors miss permit renewal deadlines? The 7 real reasons — multiple AHJs, spreadsheet decay, inspection gaps — plus the 5-habit system that stops it.')
 ON CONFLICT (slug) DO NOTHING;

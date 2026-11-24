@@ -1,8 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import FineStats from "./FineStats";
 
 const FEATURES: [string, string][] = [
-  ["Reminders before every deadline", "Permit, license, and inspection expirations with 30/14/7/1-day warnings — plus automatic 5-day follow-ups so nothing slips twice."],
+  ["Reminders before every deadline", "Permit, license, and inspection expirations with 30/14/7/1-day warnings — plus follow-ups until it's handled, so nothing slips twice."],
   ["Subcontractor COI tracking", "Certificates of insurance with expiry dates per sub. Get warned before a lapsed COI puts your job at risk."],
   ["186 official AHJ portals, all 50 states", "Direct links to the real permit portals for every state — no more hunting through county websites."],
   ["Snap a photo, skip the typing", "Upload a photo of a permit or license and the form pre-fills itself with OCR."],
@@ -15,7 +16,7 @@ const FEATURES: [string, string][] = [
 const STEPS: [string, string][] = [
   ["1. Add your permits", "Log permits, licenses, inspections, and COIs per project — or snap a photo and let OCR fill the form."],
   ["2. Set your warning windows", "Choose how far ahead you want to be warned. Smart defaults handle renewal buffers per jurisdiction."],
-  ["3. Get emailed before it's late", "Reminders land in your inbox before expirations — and keep coming every 5 days until it's handled."],
+  ["3. Get emailed before it's late", "Reminders land in your inbox before expirations — with follow-ups until it's handled."],
 ];
 
 const FAQS: [string, string][] = [
@@ -111,13 +112,14 @@ export default function LandingPage() {
         <header className="sticky top-0 z-20 border-b border-white/20 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-gray-950/70">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
             <Link href="/" className="flex items-center gap-2.5">
-              <img src="/logo-mark.png" alt="Permit Warden" className="h-9 w-9 rounded-lg shadow" />
+              <Image src="/logo-mark.png" alt="Permit Warden" width={36} height={36} className="h-9 w-9 rounded-lg shadow" />
               <span className="text-lg font-bold tracking-tight">
                 Permit <span className="bg-gradient-to-r from-blue-600 to-teal-500 bg-clip-text text-transparent">Warden</span>
               </span>
             </Link>
             <nav className="hidden items-center gap-6 text-sm font-medium text-gray-600 dark:text-gray-300 md:flex">
               <a href="#features" className="hover:text-gray-900 dark:hover:text-white">Features</a>
+              <Link href="/ahj" className="hover:text-gray-900 dark:hover:text-white">AHJ directory</Link>
               <a href="#fines" className="hover:text-gray-900 dark:hover:text-white">Fines</a>
               <a href="#how" className="hover:text-gray-900 dark:hover:text-white">How it works</a>
               <a href="#faq" className="hover:text-gray-900 dark:hover:text-white">FAQ</a>
@@ -131,6 +133,14 @@ export default function LandingPage() {
                 </button>
                 <div className="invisible absolute right-0 top-full w-64 translate-y-1 pt-2 opacity-0 transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
                   <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-900">
+                    <Link href="/tools/permit-timeline-calculator" className="block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/5">
+                      <span className="block font-semibold text-gray-900 dark:text-white">Permit timeline calculator</span>
+                      <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">Predicted expiry &amp; renewal window</span>
+                    </Link>
+                    <Link href="/tools/permit-fee-calculator" className="block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/5">
+                      <span className="block font-semibold text-gray-900 dark:text-white">Permit fee calculator</span>
+                      <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">Fees &amp; cost of delay</span>
+                    </Link>
                     <Link href="/tools/noise-ordinance-lookup" className="block px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/5">
                       <span className="block font-semibold text-gray-900 dark:text-white">Noise ordinance lookup</span>
                       <span className="block text-xs font-normal text-gray-500 dark:text-gray-400">Construction hours for 20 cities</span>
@@ -186,9 +196,10 @@ export default function LandingPage() {
                 <span className="bg-gradient-to-r from-amber-200 to-amber-400 bg-clip-text text-transparent">$500 a day.</span>
               </h1>
               <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-blue-50/90 lg:mx-0">
-                Baltimore fines up to $500 per day, per violation. New York City:
-                $800–$4,000 per violation. Permit Warden watches your permits,
-                licenses, inspections, and subcontractor insurance — and emails you{" "}
+                Permit tracking software for contractors: Baltimore fines up
+                to $500 per day, per violation. New York City: $800–$4,000 per
+                violation. Permit Warden watches your permits, licenses,
+                inspections, and subcontractor insurance — and emails you{" "}
                 <em>before</em> they expire.
               </p>
               <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
@@ -317,11 +328,23 @@ export default function LandingPage() {
         <footer className="border-t border-gray-200 py-10 dark:border-white/10">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-4 sm:flex-row sm:px-6">
             <div className="flex items-center gap-2.5">
-              <img src="/logo-mark.png" alt="Permit Warden" className="h-8 w-8 rounded-lg shadow" />
+              <Image src="/logo-mark.png" alt="Permit Warden" width={32} height={32} className="h-8 w-8 rounded-lg shadow" />
               <span className="font-bold">Permit <span className="bg-gradient-to-r from-blue-600 to-teal-500 bg-clip-text text-transparent">Warden</span></span>
             </div>
             <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <Link href="/ahj" className="hover:text-gray-900 dark:hover:text-white">AHJ directory</Link>
+              <Link href="/tools" className="hover:text-gray-900 dark:hover:text-white">Free tools</Link>
+              <Link href="/features" className="hover:text-gray-900 dark:hover:text-white">Features</Link>
+              <Link href="/pricing" className="hover:text-gray-900 dark:hover:text-white">Pricing</Link>
+              <Link href="/faq" className="hover:text-gray-900 dark:hover:text-white">FAQ</Link>
               <Link href="/blog" className="hover:text-gray-900 dark:hover:text-white">Blog</Link>
+              <Link href="/about" className="hover:text-gray-900 dark:hover:text-white">About</Link>
+              <Link href="/contact" className="hover:text-gray-900 dark:hover:text-white">Contact</Link>
+              <Link href="/glossary" className="hover:text-gray-900 dark:hover:text-white">Glossary</Link>
+              <Link href="/verified-sources" className="hover:text-gray-900 dark:hover:text-white">Verified sources</Link>
+              <Link href="/changelog" className="hover:text-gray-900 dark:hover:text-white">Changelog</Link>
+              <Link href="/privacy" className="hover:text-gray-900 dark:hover:text-white">Privacy</Link>
+              <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white">Terms</Link>
               <Link href="/compare/permitwarden-vs-excel" className="hover:text-gray-900 dark:hover:text-white">vs. Excel</Link>
               <Link href="/solutions/solar" className="hover:text-gray-900 dark:hover:text-white">Solar</Link>
               <Link href="/solutions/roofing" className="hover:text-gray-900 dark:hover:text-white">Roofing</Link>

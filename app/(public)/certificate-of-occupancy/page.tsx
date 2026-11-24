@@ -4,7 +4,7 @@ import Link from "next/link";
 const PAGE_URL = "https://permitwarden.com/certificate-of-occupancy";
 const TITLE = "Certificate of Occupancy: What It Is, When You Need One & How to Get It";
 const DESCRIPTION =
-  "A certificate of occupancy (CO) is the final approval that makes a building legal to occupy. Learn when you need one, the 5 steps to get it, how it differs from a building permit, and find your city's permit portal.";
+  "A certificate of occupancy (CO) is the final approval that makes a building legal to occupy. Learn when you need one and the 5 steps to get it.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -105,6 +105,9 @@ export default function CertificateOfOccupancyPage() {
             final green light: proof that a building matches its approved plans, passes code,
             and is legal to occupy. No CO, no move-in — and usually no final payment, business
             license, or closing.
+          </p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Last updated November 24, 2026.
           </p>
 
           <section className="mt-14">
@@ -247,6 +250,12 @@ export default function CertificateOfOccupancyPage() {
                 className="inline-block rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 hover:border-sky-300 dark:border-white/15 dark:bg-gray-900 dark:text-gray-100"
               >
                 Read the full CO guide
+              </Link>
+              <Link
+                href="/tools"
+                className="inline-block rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 hover:border-sky-300 dark:border-white/15 dark:bg-gray-900 dark:text-gray-100"
+              >
+                Browse free permit tools
               </Link>
             </div>
           </section>

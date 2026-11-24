@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Card, Badge } from "@/components/ui";
-import { complianceStatus } from "@/lib/subcontractor-compliance";
+import { complianceStatus } from "@/lib/shared/subcontractor-compliance";
 import Link from "next/link";
 import { DocumentUploadForm, DeleteDocButton, InviteForm } from "./components";
 import { SubcontractorEditButton } from "./subcontractor-edit";

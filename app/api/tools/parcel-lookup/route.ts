@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { findAssessor, assessorSearchUrl } from "@/lib/county-assessors";
+import { findAssessor, assessorSearchUrl } from "@/lib/shared/county-assessors";
+import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/shared/rate-limit";
 
 const CENSUS_GEOCODE =
   "https://geocoding.geo.census.gov/geocoder/geographies/address";
@@ -16,6 +17,10 @@ interface CensusMatch {
 }
 
 export async function GET(req: NextRequest) {
+  // Public tool hitting an upstream API: 30 lookups per IP per minute.
+  const limit = checkRateLimit(`tools:parcel:${getClientIp(req)}`, 30, 60 * 1000);
+  if (!limit.allowed) return rateLimitResponse(limit.retryAfterSeconds);
+
   const { searchParams } = new URL(req.url);
   const street = searchParams.get("street")?.trim();
   const city = searchParams.get("city")?.trim();

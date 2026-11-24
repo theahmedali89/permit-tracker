@@ -1,6 +1,9 @@
+// Thin route: sign-in logic lives in lib/features/auth.
 import { createClient } from "@/lib/supabase/server";
+import { getClientIp, rateLimitResponse } from "@/lib/shared/rate-limit";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
+import { AuthRateLimitedError, signInWithPassword } from "@/lib/features/auth";
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -8,14 +11,14 @@ export async function POST(request: NextRequest) {
   const password = formData.get("password") as string;
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    redirect(`/signin?error=${encodeURIComponent(error.message)}`);
+  let redirectTo: string;
+  try {
+    redirectTo = await signInWithPassword(supabase, getClientIp(request), email, password);
+  } catch (err) {
+    if (err instanceof AuthRateLimitedError) {
+      return rateLimitResponse(err.retryAfterSeconds);
+    }
+    throw err;
   }
-
-  redirect("/dashboard");
+  redirect(redirectTo);
 }

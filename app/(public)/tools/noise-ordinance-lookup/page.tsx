@@ -42,7 +42,7 @@ const FAQS: Array<[string, string]> = [
   ],
   [
     "Why do some cities show 'not verified yet'?",
-    "We only publish numbers taken from an official city source we could read on November 3, 2026. Where a city publishes no numeric limit, or the source page was unreadable, we show 'not verified yet' instead of guessing. More cities and fields are being verified every week.",
+    "We only publish numbers we could verify from a citable source. Where a city publishes no numeric limit for a field — or no fixed rule exists for it — we show 'not verified yet' instead of guessing. Fields verified on November 24, 2026 are noted with their source on the city page.",
   ],
   [
     "Is this noise ordinance lookup free?",
@@ -119,8 +119,9 @@ export default function NoiseOrdinanceLookupPage() {
           <p className="mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
             Contractors get fined when crews start too early or run too loud. This free
             noise ordinance lookup shows the legal construction hours and residential
-            noise limits for 20 major US cities, taken from each city&apos;s official
-            code and verified on November 3, 2026. Pick a city to see weekday and
+            noise limits for 20 major US cities. Most rules were read from each
+            city&apos;s code and verified on November 3, 2026; a few fields were
+            verified from official sources on November 24, 2026. Pick a city to see weekday and
             weekend hours, dB caps, and the source document.
           </p>
 
@@ -170,8 +171,9 @@ export default function NoiseOrdinanceLookupPage() {
               Cities covered so far
             </h2>
             <p className="mt-2 text-gray-600 dark:text-gray-300">
-              Every city below was read from an official source on November 3, 2026. New
-              cities are added as their rules are verified.
+              Each city&apos;s rules below link to the source they were read from.
+              Most were verified on November 3, 2026; fields added later were
+              verified on November 24, 2026. New cities are added as their rules are verified.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {CITIES.map((c) => (

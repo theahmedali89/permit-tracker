@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const HIGHLIGHTS = [
@@ -18,7 +19,7 @@ const HIGHLIGHTS = [
 function Logo() {
   return (
     <Link href="/" className="inline-flex items-center gap-2.5 rounded-2xl px-3 py-2">
-      <img src="/logo-mark.png" alt="Permit Warden" className="h-11 w-11 rounded-xl shadow-lg" />
+      <Image src="/logo-mark.png" alt="Permit Warden" width={44} height={44} className="h-11 w-11 rounded-xl shadow-lg" />
       <span className="text-lg font-bold tracking-tight text-white">
         Permit Warden
       </span>
@@ -100,7 +101,7 @@ export function AuthLayout({
         <div className="w-full max-w-md rounded-2xl border border-white/60 bg-white/70 p-6 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-gray-800/70 sm:p-8">
           <div className="mb-8 lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              <img src="/logo-mark.png" alt="Permit Warden" className="h-10 w-10 rounded-xl shadow" />
+              <Image src="/logo-mark.png" alt="Permit Warden" width={40} height={40} className="h-10 w-10 rounded-xl shadow" />
               <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Permit Warden</span>
             </Link>
           </div>

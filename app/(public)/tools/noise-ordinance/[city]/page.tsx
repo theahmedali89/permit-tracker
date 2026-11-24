@@ -99,7 +99,7 @@ export default async function NoiseOrdinanceCityPage({
     ],
     [
       "Where does this data come from?",
-      `Every rule on this page was read from the ${n.sourceLabel} and verified on ${VERIFIED_DATE}. The source link appears with each rule so you can confirm the current text yourself.`,
+      `Each rule on this page links to the source it was read from, with the verification date shown beside it. Most rules were verified on ${VERIFIED_DATE}; fields added later were verified on November 24, 2026. Where the linked source is a secondary copy of the city code rather than the city's own site, confirm the current text with the city before scheduling work.`,
     ],
   ];
 

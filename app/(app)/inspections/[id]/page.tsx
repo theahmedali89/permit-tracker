@@ -97,11 +97,20 @@ export default async function InspectionDetailPage({
                 </div>
               )}
               {inspection.reinspection_date && (
-                <div>
+                <div className="mb-3">
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Re-inspection Date</p>
                   <p className="text-sm font-medium">{new Date(inspection.reinspection_date).toLocaleDateString()}</p>
                 </div>
               )}
+              {inspection.correction_photo_url && (
+                <div className="mb-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Correction Photo</p>
+                  <p className="text-sm">✓ Photo attached <span className="text-gray-500">({inspection.correction_photo_url})</span></p>
+                </div>
+              )}
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Re-inspection reminder will be emailed.
+              </p>
             </Card>
           )}
         </div>

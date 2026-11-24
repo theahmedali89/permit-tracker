@@ -1,8 +1,10 @@
-import { google } from "googleapis";
+// Thin route: Google Calendar OAuth callback lives in
+// lib/features/calendar/oauth.ts. This handler only resolves the
+// signed-in user and the request's own origin, then redirects to the
+// URL the feature returns.
 import { createClient } from "@/lib/supabase/server";
-import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
-import { getOAuthClient, verifyState } from "../route";
+import { handleGoogleCalendarCallback } from "@/lib/features/calendar";
 
 // GET /api/auth/google-calendar/callback — handle OAuth callback
 export async function GET(request: NextRequest) {
@@ -20,94 +22,12 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const code = searchParams.get("code");
-  const rawState = searchParams.get("state");
-  const error = searchParams.get("error");
-
-  const appUrl = origin;
-
-  if (error || !code) {
-    return NextResponse.redirect(
-      `${appUrl}/settings?calendar=error&reason=${error || "no_code"}`
-    );
-  }
-
-  // Verify the signed state — rejects tampered, expired or missing state
-  const orgId = rawState ? verifyState(rawState) : null;
-  if (!orgId) {
-    return NextResponse.redirect(
-      `${appUrl}/settings?calendar=error&reason=invalid_state`
-    );
-  }
-
-  // Only workspace admins may connect (or replace) the org's Google account
-  const { data: membership } = await supabase
-    .from("organization_members")
-    .select("role")
-    .eq("user_id", user.id)
-    .eq("organization_id", orgId)
-    .limit(1)
-    .single();
-  if (membership?.role !== "owner" && membership?.role !== "admin") {
-    return NextResponse.redirect(
-      `${appUrl}/settings?calendar=error&reason=not_admin`
-    );
-  }
-
-  try {
-    // Must use the SAME redirect_uri that was sent to Google in the
-    // authorize step — derived from this request's host, matching exactly.
-    const oauth2Client = getOAuthClient(
-      `${origin}/api/auth/google-calendar/callback`
-    );
-    const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
-
-    // Get user's Google email for display
-    let googleEmail: string | null = null;
-    try {
-      const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
-      const { data } = await oauth2.userinfo.get();
-      googleEmail = data.email || null;
-    } catch {
-      // non-fatal
-    }
-
-    // Save tokens (use service role to bypass RLS for upsert reliability)
-    const serviceClient = createServiceClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
-    const { error: dbError } = await serviceClient
-      .from("google_calendar_tokens")
-      .upsert(
-        {
-          organization_id: orgId,
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token || null,
-          expiry_date: tokens.expiry_date || null,
-          google_email: googleEmail,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "organization_id" }
-      );
-
-    if (dbError) throw dbError;
-
-    await serviceClient.from("audit_events").insert({
-      organization_id: orgId,
-      actor_id: user.id,
-      action: "google_calendar.connected",
-      entity_type: "integration",
-      entity_id: orgId,
-    });
-
-    return NextResponse.redirect(`${appUrl}/settings?calendar=connected`);
-  } catch (err: any) {
-    console.error("Google Calendar OAuth callback error:", err.message);
-    return NextResponse.redirect(
-      `${appUrl}/settings?calendar=error&reason=token_exchange_failed`
-    );
-  }
+  const redirectUrl = await handleGoogleCalendarCallback(supabase, {
+    userId: user.id,
+    origin,
+    code: searchParams.get("code"),
+    rawState: searchParams.get("state"),
+    error: searchParams.get("error"),
+  });
+  return NextResponse.redirect(redirectUrl);
 }

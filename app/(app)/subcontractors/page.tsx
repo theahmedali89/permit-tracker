@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { Card, Badge, Button } from "@/components/ui";
-import { complianceStatus } from "@/lib/subcontractor-compliance";
+import { complianceStatus } from "@/lib/shared/subcontractor-compliance";
 import Link from "next/link";
 
 export default async function SubcontractorsPage() {

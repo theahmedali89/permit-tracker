@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { STATE_NAMES, stateSlug, type AhjEntry } from "./_lib";
 
 const PAGE_URL = "https://permitwarden.com/ahj";
 
 export const metadata: Metadata = {
-  title: "Permit portal directory — official AHJ links for all 50 states | Permit Warden",
+  title: "Permit portal directory — official AHJ links for all 50 states",
   description:
     "Find the official building permit portal for your city or county. 186 curated authority links across all 50 states — direct to the source, no hunting through county websites.",
   alternates: { canonical: PAGE_URL },
@@ -36,7 +36,7 @@ const COLLECTION_JSON_LD = {
 };
 
 export default async function AhjHubPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("ahj_directory")
     .select("state")

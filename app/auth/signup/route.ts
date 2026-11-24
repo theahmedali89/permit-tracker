@@ -1,6 +1,9 @@
+// Thin route: sign-up logic lives in lib/features/auth.
 import { createClient } from "@/lib/supabase/server";
+import { getClientIp, rateLimitResponse } from "@/lib/shared/rate-limit";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
+import { AuthRateLimitedError, signUp } from "@/lib/features/auth";
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -8,17 +11,14 @@ export async function POST(request: NextRequest) {
   const password = formData.get("password") as string;
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-    },
-  });
-
-  if (error) {
-    redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+  let redirectTo: string;
+  try {
+    redirectTo = await signUp(supabase, getClientIp(request), email, password);
+  } catch (err) {
+    if (err instanceof AuthRateLimitedError) {
+      return rateLimitResponse(err.retryAfterSeconds);
+    }
+    throw err;
   }
-
-  redirect("/signin?message=Check your email to verify your account");
+  redirect(redirectTo);
 }

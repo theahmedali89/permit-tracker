@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { LICENSE_BOARDS } from "@/lib/license-boards";
+import { LICENSE_BOARDS } from "@/lib/shared/license-boards";
 import { stateSlug } from "../../ahj/_lib";
 
 const TRADES = [

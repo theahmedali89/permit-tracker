@@ -114,3 +114,22 @@ The `vercel.json` includes cron for daily reminders at 9 AM UTC.
 - ✅ Input validation
 - ✅ Secure file uploads (private bucket)
 - ✅ Environment variables for secrets
+
+## How to change one feature
+
+Read `ARCHITECTURE.md` first. The short version:
+
+1. **One feature = one folder:** `lib/features/<feature>/` (logic + tests +
+   README). Shared code lives only in `lib/shared/`; features never import
+   each other; API routes are thin.
+2. **Find the blast radius:** read the feature's README and its entry in
+   `lib/features/registry.ts` — the listed routes and tables are everything
+   the change may touch.
+3. **Change only that feature's folder** plus its listed thin routes. New
+   shared helpers go in `lib/shared/`, not in the feature.
+4. **Checklist:** registry entry updated if routes/tables/env keys changed ·
+   feature README updated if behaviour changed · `npx tsc --noEmit` passes ·
+   only the feature's own routes verified.
+5. **To remove a feature:** set `enabled: false` in the registry, delete
+   `lib/features/<feature>/`, remove its routes and registry entry (see
+   `ARCHITECTURE.md` for the full steps).

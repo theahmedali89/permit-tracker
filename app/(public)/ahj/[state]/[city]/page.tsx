@@ -1,23 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { createBuildClient } from "@/lib/supabase/build";
 import { STATE_NAMES, stateSlug, stateCodeFromSlug, citySlug, type AhjEntry } from "../../_lib";
-import { getRegulation, type RegulationData } from "../../_regulations";
-
-/** True when the regulation row has at least one substantive field worth showing. */
-function hasRegulationContent(reg: RegulationData): boolean {
-  return (
-    reg.validity_days !== undefined ||
-    reg.validity_notes !== undefined ||
-    reg.extension_allowed !== undefined ||
-    reg.extension_process !== undefined ||
-    reg.extension_fee_usd !== undefined ||
-    reg.processing_days !== undefined ||
-    reg.source_url !== undefined
-  );
-}
+import { getRegulation, hasRegulationContent, type RegulationData } from "../../_regulations";
 
 export async function generateStaticParams() {
   // Build-time only: no cookies available. If the DB is unreachable (e.g. no
@@ -40,7 +27,7 @@ export async function generateStaticParams() {
 async function getEntry(stateSlugParam: string, citySlugParam: string) {
   const code = stateCodeFromSlug(stateSlugParam);
   if (!code) return null;
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("ahj_directory")
     .select("*")
@@ -69,10 +56,14 @@ export async function generateMetadata({
     reg && reg.validity_days !== undefined
       ? ` Building permits typically valid ${reg.validity_days} days.`
       : "";
+  // Thin pages (portal link only, no verified regulation data) stay out of
+  // search results until regulation data is added — same rule as the sitemap.
+  const hasData = reg !== undefined && hasRegulationContent(reg);
   return {
-    title: `${place} permit portal — ${entry.authority_name} | Permit Warden`,
+    title: `${place} permit portal — ${entry.authority_name}`,
     description: `Official permit portal for ${place}, ${name}: ${entry.authority_name}.${validityBit} Direct portal link${entry.phone ? `, phone ${entry.phone}` : ""}.`,
     alternates: { canonical: url },
+    robots: hasData ? undefined : { index: false, follow: true },
     openGraph: {
       title: `${place} permit portal`,
       description: `Official portal: ${entry.authority_name}.${validityBit}`,
@@ -251,6 +242,62 @@ export default async function JurisdictionPage({
             </dl>
           </div>
 
+          {!showReg && (
+            <div className="mt-8 rounded-lg border border-amber-200 bg-amber-50 p-6 dark:border-amber-800 dark:bg-amber-900/20">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Data coming soon
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                Detailed permit validity and renewal data for {place} is coming
+                soon — the official portal link above is the verified starting
+                point. Until then, confirm fees, validity periods, and
+                deadlines directly with the department.
+              </p>
+            </div>
+          )}
+
+          {showReg && reg && (
+            <div className="mt-8 rounded-lg border border-emerald-200 bg-emerald-50 p-6 dark:border-emerald-800 dark:bg-emerald-900/20">
+              <p className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
+                {entry.verified_at && (
+                  <>
+                    Last verified:{" "}
+                    {new Date(entry.verified_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}{" "}
+                    ·{" "}
+                  </>
+                )}
+                {reg.source_url ? (
+                  <a
+                    href={reg.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-700 underline hover:text-sky-800 dark:text-sky-300"
+                  >
+                    Source: official source ↗
+                  </a>
+                ) : (
+                  "Source: official city/county publication"
+                )}
+                {" · Regulation data researched "}
+                {reg.researched_date
+                  ? new Date(`${reg.researched_date}T00:00:00`).toLocaleDateString(
+                      "en-US",
+                      { year: "numeric", month: "long", day: "numeric" },
+                    )
+                  : "October 17, 2026"}
+              </p>
+              <p className="mt-1 text-xs text-emerald-800/80 dark:text-emerald-200/70">
+                Validity, extension, and processing figures below come from the
+                cited official source. Rules change — confirm with the
+                department before acting.
+              </p>
+            </div>
+          )}
+
           {showReg && reg && (
             <div className="mt-8 rounded-lg border border-emerald-200 bg-white p-6 dark:border-emerald-800 dark:bg-gray-800">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -322,6 +369,22 @@ export default async function JurisdictionPage({
                 )}
               </dl>
             </div>
+          )}
+
+          {faqQuestions.length > 0 && (
+            <section className="mt-10">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Frequently asked questions — {place}
+              </h2>
+              <div className="mt-4 space-y-6">
+                {faqQuestions.map((q) => (
+                  <div key={q.name}>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{q.name}</h3>
+                    <p className="mt-1 text-gray-700 dark:text-gray-300">{q.text}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
           )}
 
           {siblings.length > 0 && (

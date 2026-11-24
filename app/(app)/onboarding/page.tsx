@@ -97,6 +97,22 @@ export default async function OnboardingPage() {
             </div>
           </div>
           <div>
+            <label className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                name="sample_data"
+                value="1"
+                defaultChecked
+                className="mt-0.5 h-4 w-4"
+              />
+              <span>
+                Add sample project &amp; permits so I can explore (1 sample
+                project + 3 sample permits in Austin, TX, clearly labelled
+                SAMPLE — remove them any time from the dashboard)
+              </span>
+            </label>
+          </div>
+          <div>
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

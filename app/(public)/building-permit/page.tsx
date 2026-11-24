@@ -4,7 +4,7 @@ import Link from "next/link";
 const PAGE_URL = "https://permitwarden.com/building-permit";
 const TITLE = "What Is a Building Permit? How to Get One (Complete Guide)";
 const DESCRIPTION =
-  "A building permit is your local government's written approval to build, remodel, or demolish — issued before work starts and closed out by inspections. Learn when you need one, the 6 steps to get one, and what happens if you skip it.";
+  "A building permit is your local government's written approval to build, remodel, or demolish. Learn when you need one and the 6 steps to get one.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -110,6 +110,9 @@ export default function BuildingPermitPage() {
             plans the building department has reviewed for code and zoning compliance. It is
             not a tax or a formality: it is the trigger for the inspections that prove the
             work is safe.
+          </p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Last updated November 24, 2026.
           </p>
 
           <section className="mt-14">
@@ -241,6 +244,43 @@ export default function BuildingPermitPage() {
                 Look up a parcel number (APN)
               </Link>
             </div>
+          </section>
+
+          <section className="mt-14">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              What skipping a permit can cost
+            </h2>
+            <p className="mt-2 leading-relaxed text-gray-600 dark:text-gray-300">
+              Building without a permit — or letting one lapse — is fined from published
+              municipal penalty schedules, not guessed at. New York City fines{" "}
+              <strong>$800–$4,000 per violation</strong> (Class 2), Baltimore fines up to{" "}
+              <strong>$500/day</strong>, Chicago up to <strong>$1,000/day</strong>, and Palo
+              Alto charges an escalating <strong>$200 → $800/day</strong> for expired
+              permits. Sources:{" "}
+              <a href="https://www.nyc.gov/html/ecb/downloads/pdf/BuildingsPenaltySchedule.pdf" target="_blank" rel="noopener noreferrer" className="font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400">
+                NYC DOB penalty schedule
+              </a>
+              {", "}
+              <a href="https://codes.baltimorecity.gov/us/md/cities/baltimore/code/building-codes/II/114" target="_blank" rel="noopener noreferrer" className="font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400">
+                Baltimore City Building Code §114
+              </a>
+              {", "}
+              <a href="https://codelibrary.amlegal.com/codes/chicago/latest/chicago_il/0-0-0-2661915" target="_blank" rel="noopener noreferrer" className="font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400">
+                Chicago Construction Codes 14A-12-1203.1
+              </a>
+              {", and "}
+              <a href="https://www.cityofpaloalto.org/files/assets/public/agendas-minutes-reports/reports/city-manager-reports-cmrs/year-archive/2013/id-4314-agenda-item-number-10.pdf" target="_blank" rel="noopener noreferrer" className="font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400">
+                Palo Alto Municipal Code 16.61.030
+              </a>
+              .
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+              See what a delay would cost on your job with our{" "}
+              <Link href="/tools/permit-fee-calculator" className="font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400">
+                permit fee &amp; cost-of-delay calculator
+              </Link>
+              .
+            </p>
           </section>
 
           <section className="mt-14">

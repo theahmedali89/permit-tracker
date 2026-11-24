@@ -6,6 +6,7 @@ import Link from "next/link";
 import DeleteButton from "@/components/DeleteButton";
 import { DocumentUpload } from "./upload";
 import { DeadlineAdd } from "./deadline-add";
+import { smartBufferForPermit, urgencyLabel } from "@/lib/features/smart-buffer";
 
 export default async function PermitDetailPage({
   params,
@@ -37,6 +38,8 @@ export default async function PermitDetailPage({
     .eq("resource_type", "permit")
     .eq("resource_id", id)
     .order("due_date");
+
+  const smartBuffer = smartBufferForPermit(permit);
 
   return (
     <AppShell>
@@ -152,6 +155,54 @@ export default async function PermitDetailPage({
               </div>
             )}
           </Card>
+
+          {smartBuffer && (
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold mb-2">Renewal buffer</h2>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                Apply by{" "}
+                <strong>
+                  {new Date(smartBuffer.buffer.applyByDate).toLocaleDateString()}
+                </strong>
+                {" — "}
+                {smartBuffer.regulation.city} takes{" "}
+                {smartBuffer.buffer.processingDays !== null
+                  ? `~${smartBuffer.buffer.processingDays} days`
+                  : "an unverified amount of time"}{" "}
+                + 7-day buffer
+              </p>
+              <p className="mt-1 text-sm">
+                <Badge
+                  color={
+                    smartBuffer.buffer.urgency === "overdue"
+                      ? "red"
+                      : smartBuffer.buffer.urgency === "urgent"
+                        ? "red"
+                        : smartBuffer.buffer.urgency === "soon"
+                          ? "yellow"
+                          : "green"
+                  }
+                >
+                  {urgencyLabel(smartBuffer.buffer.urgency)}
+                </Badge>
+                <span className="ml-2 text-gray-500 dark:text-gray-400">
+                  {smartBuffer.buffer.daysUntilApplyBy < 0
+                    ? `${Math.abs(smartBuffer.buffer.daysUntilApplyBy)} days past the apply-by date`
+                    : `${smartBuffer.buffer.daysUntilApplyBy} days left to apply`}
+                </span>
+              </p>
+              {smartBuffer.regulation.source_url && (
+                <a
+                  href={smartBuffer.regulation.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-block text-xs font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400"
+                >
+                  Source: {smartBuffer.regulation.jurisdiction_name} official guidance ↗
+                </a>
+              )}
+            </Card>
+          )}
 
           <Card className="p-6">
             <div className="flex justify-between items-center mb-4">

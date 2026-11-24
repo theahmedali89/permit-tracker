@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export const metadata: Metadata = {
   title: "Blog - Permit guides & compliance tips",
@@ -25,11 +26,16 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
+function readingTimeMinutes(content: string | null): number {
+  if (!content) return 0;
+  return Math.max(1, Math.ceil(content.split(/\s+/).length / 200));
+}
+
 export default async function BlogIndexPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data: posts } = await supabase
     .from("blog_posts")
-    .select("slug, title, excerpt, published_at")
+    .select("slug, title, excerpt, published_at, author, category, tags, featured_image, content")
     .eq("published", true)
     .order("published_at", { ascending: false });
 
@@ -57,27 +63,42 @@ export default async function BlogIndexPage() {
           </div>
         ) : (
           <div className="mt-10 space-y-6">
-            {posts.map((post) => (
-              <Link
-                key={post.slug}
-                href={`/blog/${post.slug}`}
-                className="block rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:shadow-md transition-shadow"
-              >
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {post.title}
-                </h2>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">{post.excerpt}</p>
-                {post.published_at && (
-                  <p className="mt-3 text-sm text-gray-500 dark:text-gray-500">
-                    {new Date(post.published_at).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </p>
-                )}
-              </Link>
-            ))}
+            {posts.map((post) => {
+              const minutes = readingTimeMinutes(post.content);
+              return (
+                <Link
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className="block overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition-shadow"
+                >
+                  {post.featured_image && (
+                    <Image
+                      src={post.featured_image}
+                      alt={post.title}
+                      width={1200}
+                      height={630}
+                      className="h-48 w-full object-cover"
+                    />
+                  )}
+                  <div className="p-6">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                      {post.title}
+                    </h2>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">{post.excerpt}</p>
+                    <p className="mt-3 text-sm text-gray-500 dark:text-gray-500">
+                      {post.category && <span>{post.category} · </span>}
+                      {minutes > 0 && <span>{minutes} min read · </span>}
+                      {post.published_at &&
+                        new Date(post.published_at).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
