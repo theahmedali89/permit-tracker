@@ -66,3 +66,9 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.28);
   box-shadow: 0 18px 44px rgba(3, 32, 60, 0.28);
 }
+
+/* Dark mode follows the .dark class (ThemeProvider), not just the OS */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
