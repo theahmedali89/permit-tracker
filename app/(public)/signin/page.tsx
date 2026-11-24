@@ -29,10 +29,11 @@ export default async function SignInPage({
 
   return (
     <AuthLayout
-      heading="Welcome back"
+      eyebrow="Secure sign in"
+      heading="Sign in to your dashboard"
       subheading={
         <>
-          Sign in to pick up where you left off. New here?{" "}
+          Your permits, inspections and renewals — all in one place. New here?{" "}
           <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
             Create an account
           </Link>
@@ -54,7 +55,22 @@ export default async function SignInPage({
           <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Email address
           </label>
-          <input id="email" name="email" type="email" required placeholder="you@company.com" className={inputCls} />
+          <div className="relative">
+            <svg
+              className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400 dark:text-gray-500"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-10 6L2 7" />
+            </svg>
+            <input id="email" name="email" type="email" required placeholder="you@company.com" className={`${inputCls} pl-11`} />
+          </div>
         </div>
         <div>
           <div className="mb-1.5 flex items-center justify-between">
@@ -65,7 +81,7 @@ export default async function SignInPage({
               Forgot password?
             </Link>
           </div>
-          <PasswordField />
+          <PasswordField lockIcon />
         </div>
         <button
           type="submit"

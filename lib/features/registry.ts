@@ -293,6 +293,16 @@ export const FEATURE_REGISTRY: FeatureEntry[] = [
     enabled: true,
   },
   {
+    id: "landing-redesign",
+    name: "Landing redesign (merged 3D hero + bento dashboard + modern sign-in)",
+    routes: ["/", "/dashboard", "/signin"],
+    tables: [],
+    envKeys: [],
+    enabled: true,
+    notes:
+      "Presentational redesign from the approved preview (permit-warden-complete.html). Hero scene and mockup are illustrative sample art; dashboard sections take real data as props from the dashboard/smart-buffer features. No Google button — the app has no Google OAuth wiring.",
+  },
+  {
     id: "calendar",
     name: "Google Calendar sync + OAuth",
     routes: [

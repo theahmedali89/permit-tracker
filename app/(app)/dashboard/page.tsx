@@ -2,9 +2,22 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { Card, Badge } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { smartBufferForPermit } from "@/lib/features/smart-buffer";
 import { getDashboardData } from "@/lib/features/dashboard";
+import {
+  buildJourneySteps,
+  buildPipelineStages,
+  DashboardBento,
+  JourneyTimeline,
+  monthlyBarTotals,
+  PipelineStages,
+} from "@/lib/features/landing-redesign";
+import type {
+  ExpiringRow,
+  InspectionRow,
+  SmartBufferCard,
+} from "@/lib/features/landing-redesign";
 import { RemoveSampleDataButton } from "./remove-sample-data";
 
 /* ── Inline SVG icons (no emoji) ── */
@@ -199,37 +212,6 @@ function DonutChart({ segments }: { segments: { value: number; color: string; la
   );
 }
 
-function ForecastChart({ months }: { months: { label: string; permits: number; licenses: number; documents: number }[] }) {
-  const max = Math.max(1, ...months.map((m) => m.permits + m.licenses + m.documents));
-  return (
-    <div>
-      <div className="flex items-end gap-3 h-36">
-        {months.map((m) => {
-          const total = m.permits + m.licenses + m.documents;
-          return (
-            <div key={m.label} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                {total > 0 ? total : ""}
-              </span>
-              <div className="w-full max-w-10 flex flex-col-reverse rounded-t-md overflow-hidden bg-gray-100 dark:bg-gray-700/60" style={{ height: `${Math.max(4, (total / max) * 100)}%` }}>
-                {m.documents > 0 && <div className="bg-slate-400 dark:bg-slate-500" style={{ height: `${(m.documents / total) * 100}%` }} title={`${m.documents} documents`} />}
-                {m.licenses > 0 && <div className="bg-amber-400" style={{ height: `${(m.licenses / total) * 100}%` }} title={`${m.licenses} licenses`} />}
-                {m.permits > 0 && <div className="bg-blue-500" style={{ height: `${(m.permits / total) * 100}%` }} title={`${m.permits} permits`} />}
-              </div>
-              <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{m.label}</span>
-            </div>
-          );
-        })}
-      </div>
-      <div className="mt-4 flex items-center justify-center gap-5 text-xs text-gray-500 dark:text-gray-400">
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-blue-500" /> Permits</span>
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-amber-400" /> Licenses</span>
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-slate-400" /> Documents</span>
-      </div>
-    </div>
-  );
-}
-
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -259,6 +241,8 @@ export default async function DashboardPage() {
     recentActivity,
     forecast,
     compliance,
+    stageExamples,
+    inspectionCount,
   } = await getDashboardData(supabase, orgId);
 
   const todayLabel = new Date().toLocaleDateString("en-US", {
@@ -266,6 +250,88 @@ export default async function DashboardPage() {
     month: "long",
     day: "numeric",
   });
+
+  // ── Landing redesign: assemble the bento / pipeline / journey props ──
+  // Everything below is derived from the real data above — nothing is
+  // invented. Where a section has no backing data it renders empty.
+  const expiringRows: ExpiringRow[] = (actionItems || []).map((permit: any) => {
+    const isExpired = permit.status === "expired";
+    const days = permit.expiration_date ? daysUntil(permit.expiration_date) : null;
+    const buffer = smartBufferForPermit(permit)?.buffer ?? null;
+    return {
+      id: permit.id,
+      title: `${permit.permit_type}${permit.permit_number ? ` #${permit.permit_number}` : ""}`,
+      meta: `${permit.projects?.name ?? "No project"} · ${
+        isExpired ? "Expired" : "Expires"
+      } ${permit.expiration_date ? formatDate(permit.expiration_date) : "—"}`,
+      applyByLabel: buffer ? formatDate(buffer.applyByDate) : permit.expiration_date ? formatDate(permit.expiration_date) : "—",
+      daysLabel:
+        days === null
+          ? "—"
+          : isExpired
+            ? `${Math.abs(days)}d overdue`
+            : `${days}d left`,
+      href: `/permits/${permit.id}`,
+    };
+  });
+
+  // Smart buffer card: the first expiring permit with verified regulation data.
+  let smartBufferCard: SmartBufferCard | null = null;
+  for (const permit of actionItems || []) {
+    const result = smartBufferForPermit(permit);
+    if (result && permit.expiration_date) {
+      smartBufferCard = {
+        cityLabel: result.regulation.city,
+        applyByLabel: formatDate(result.buffer.applyByDate),
+        expiryLabel: formatDate(permit.expiration_date),
+        processingDays: result.buffer.processingDays,
+      };
+      break;
+    }
+  }
+
+  const inspectionDeadlines = (upcoming || []).filter((d: any) => d.resource_type === "inspection");
+  const inspectionRows: InspectionRow[] = inspectionDeadlines.slice(0, 3).map((d: any) => {
+    const due = new Date(d.due_date);
+    const days = daysUntil(d.due_date);
+    return {
+      id: d.id,
+      day: String(due.getDate()),
+      month: due.toLocaleDateString("en-US", { month: "short" }),
+      title: deadlineLabel(d),
+      meta: days === 0 ? "Due today" : days === 1 ? "Due tomorrow" : `In ${days} days`,
+    };
+  });
+
+  const pipelineStages = buildPipelineStages({
+    applied: { count: pendingCount || 0, example: stageExamples.applied ?? undefined },
+    approved: { count: activeCount || 0, example: stageExamples.approved ?? undefined },
+    inspection: {
+      count: inspectionCount || 0,
+      example: inspectionDeadlines[0]
+        ? { title: deadlineLabel(inspectionDeadlines[0]), meta: `Due ${formatDate(inspectionDeadlines[0].due_date)}` }
+        : undefined,
+    },
+    renewal: {
+      count: (expiringCount || 0) + (expiredCount || 0),
+      example: actionItems?.[0]
+        ? {
+            title: `${actionItems[0].permit_type}${actionItems[0].permit_number ? ` #${actionItems[0].permit_number}` : ""}`,
+            meta: actionItems[0].jurisdiction ?? "No jurisdiction recorded",
+          }
+        : undefined,
+    },
+  });
+
+  // Journey timeline: the most urgent permit, with its own inspection
+  // deadline linked by resource_id (never attributed from another permit).
+  const journeyPermit = actionItems?.[0] ?? null;
+  const journeyInspection = journeyPermit
+    ? inspectionDeadlines.find((d: any) => d.resource_id === journeyPermit.id)
+    : null;
+  const journeySteps = journeyPermit
+    ? buildJourneySteps(journeyPermit, journeyInspection?.due_date ?? null)
+    : null;
 
   return (
     <AppShell>
@@ -305,6 +371,40 @@ export default async function DashboardPage() {
         <StatCard label="Upcoming deadlines" value={upcoming?.length || 0} icon={ICONS.calendar} tone="info" />
       </div>
 
+      {/* Bento grid — compliance, expiring soon, smart buffer, bars, inspections */}
+      <div className="mb-8">
+        <DashboardBento
+          compliance={compliance}
+          totalPermits={(activeCount || 0) + (pendingCount || 0) + (expiringCount || 0) + (expiredCount || 0)}
+          expiring={expiringRows}
+          smartBuffer={smartBufferCard}
+          monthlyBars={monthlyBarTotals(forecast)}
+          inspections={inspectionRows}
+        />
+      </div>
+
+      {/* Permit pipeline */}
+      <div className="mb-10">
+        <PipelineStages stages={pipelineStages} />
+      </div>
+
+      {/* Permit journey — most urgent permit */}
+      {journeyPermit && journeySteps && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white mb-1">
+            Permit journey
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            The most urgent permit, step by step — from application to close-out.
+          </p>
+          <JourneyTimeline
+            permitTitle={`${journeyPermit.permit_type}${journeyPermit.permit_number ? ` #${journeyPermit.permit_number}` : ""}`}
+            permitMeta={`${journeyPermit.jurisdiction ?? "No jurisdiction recorded"}${journeyPermit.expiration_date ? ` · Expires ${formatDate(journeyPermit.expiration_date)}` : ""}`}
+            steps={journeySteps}
+          />
+        </div>
+      )}
+
       {/* Quick actions */}
       <div className="mb-8">
         <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
@@ -333,156 +433,28 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Charts: status breakdown + 6-month forecast */}
-      <div className="grid lg:grid-cols-2 gap-6 mb-8">
-        <Card className="p-6">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-            Permit status
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
-            Breakdown of all permits by current status.
-          </p>
-          <DonutChart
-            segments={[
-              { value: (activeCount || 0) + (pendingCount || 0), color: "#10b981", label: "Active" },
-              { value: expiringCount || 0, color: "#f59e0b", label: "Expiring soon" },
-              { value: expiredCount || 0, color: "#f43f5e", label: "Expired" },
-            ]}
-          />
-        </Card>
-        <Card className="p-6">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-            Renewal forecast
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
-            Expiries due in the next 6 months.
-          </p>
-          <ForecastChart months={forecast} />
-        </Card>
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-6">        {/* Action required */}
+      {/* Permit status + recent activity */}
+      <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-              Requires attention
+          <Card className="p-6">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+              Permit status
             </h2>
-            <Link href="/permits" className="text-sm font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 inline-flex items-center gap-1">
-              View all permits <Icon path={ICONS.arrow} className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-          {!actionItems || actionItems.length === 0 ? (
-            <Card className="p-8 text-center">
-              <span className="mx-auto mb-3 inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
-                <Icon path={ICONS.check} className="w-5 h-5" />
-              </span>
-              <p className="font-medium text-gray-900 dark:text-white">All clear</p>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                No permits are expired or expiring soon.
-              </p>
-            </Card>
-          ) : (
-            <Card className="divide-y divide-gray-100 dark:divide-gray-700/60">
-              {actionItems.map((permit: any) => {
-                const days = permit.expiration_date ? daysUntil(permit.expiration_date) : null;
-                const isExpired = permit.status === "expired";
-                // Smart buffer: show the apply-by date when verified
-                // regulation data exists for this permit's jurisdiction.
-                const buffer = smartBufferForPermit(permit)?.buffer ?? null;
-                return (
-                  <Link
-                    key={permit.id}
-                    href={`/permits/${permit.id}`}
-                    className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors first:rounded-t-lg last:rounded-b-lg"
-                  >
-                    <span className={`shrink-0 w-1 self-stretch rounded-full ${isExpired ? "bg-rose-500" : "bg-amber-500"}`} aria-hidden />
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-gray-900 dark:text-white truncate">
-                        {permit.permit_type}
-                        {permit.permit_number && (
-                          <span className="ml-2 font-normal text-gray-500 dark:text-gray-400">
-                            {permit.permit_number}
-                          </span>
-                        )}
-                      </p>
-                      <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
-                        {permit.projects?.name ?? "No project"}
-                        {buffer ? (
-                          <> · Apply by {formatDate(buffer.applyByDate)}</>
-                        ) : (
-                          permit.expiration_date && (
-                            <> · {isExpired ? "Expired" : "Expires"} {formatDate(permit.expiration_date)}</>
-                          )
-                        )}
-                      </p>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <Badge color={isExpired ? "red" : "yellow"}>
-                        {isExpired ? "Expired" : "Expiring soon"}
-                      </Badge>
-                      {days !== null && (
-                        <p className={`mt-1 text-xs font-medium ${isExpired ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400"}`}>
-                          {isExpired ? `${Math.abs(days)}d overdue` : `${days}d left`}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
-                );
-              })}
-            </Card>
-          )}
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+              Breakdown of all permits by current status.
+            </p>
+            <DonutChart
+              segments={[
+                { value: (activeCount || 0) + (pendingCount || 0), color: "#10b981", label: "Active" },
+                { value: expiringCount || 0, color: "#f59e0b", label: "Expiring soon" },
+                { value: expiredCount || 0, color: "#f43f5e", label: "Expired" },
+              ]}
+            />
+          </Card>
         </div>
-
-        {/* Upcoming deadlines */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-              Upcoming deadlines
-            </h2>
-            <Link href="/calendar" className="text-sm font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 inline-flex items-center gap-1">
-              Calendar <Icon path={ICONS.arrow} className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-          {!upcoming || upcoming.length === 0 ? (
-            <Card className="p-6 text-center">
-              <span className="mx-auto mb-3 inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                <Icon path={ICONS.calendar} />
-              </span>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                No upcoming deadlines scheduled.
-              </p>
-            </Card>
-          ) : (
-            <Card className="divide-y divide-gray-100 dark:divide-gray-700/60">
-              {upcoming.map((d: any) => {
-                const days = daysUntil(d.due_date);
-                const urgent = days <= 7;
-                return (
-                  <div key={d.id} className="flex items-center gap-3 p-4">
-                    <div className={`shrink-0 w-11 text-center rounded-lg py-1.5 ${urgent ? "bg-rose-50 dark:bg-rose-900/30" : "bg-slate-100 dark:bg-slate-800"}`}>
-                      <p className={`text-lg font-semibold leading-none ${urgent ? "text-rose-600 dark:text-rose-400" : "text-gray-900 dark:text-white"}`}>
-                        {new Date(d.due_date).getDate()}
-                      </p>
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                        {new Date(d.due_date).toLocaleDateString("en-US", { month: "short" })}
-                      </p>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        {deadlineLabel(d)}
-                      </p>
-                      <p className={`text-xs mt-0.5 ${urgent ? "text-rose-600 dark:text-rose-400 font-medium" : "text-gray-500 dark:text-gray-400"}`}>
-                        {days === 0 ? "Due today" : days === 1 ? "Due tomorrow" : `In ${days} days`}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </Card>
-          )}
-
           {/* Recent activity */}
-          <div className="mt-6">
+          <div>
             <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
               Recent activity
             </h2>

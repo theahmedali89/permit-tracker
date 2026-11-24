@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "@/components/theme-provider";
+import { ThemeToggle } from "@/lib/features/landing-redesign";
 
 function NavIcon({ path, className = "w-5 h-5" }: { path: string; className?: string }) {
   return (
@@ -29,7 +29,6 @@ const nav: { href: string; label: string; icon: string }[] = [
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
@@ -62,18 +61,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           </Link>
         ))}
       </nav>
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <select
-          value={theme}
-          onChange={(e) => setTheme(e.target.value as "light" | "dark" | "system")}
-          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-          aria-label="Theme"
-        >
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="system">System</option>
-        </select>
-        <form action="/auth/signout" method="post" className="mt-2">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
+        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Appearance</span>
+        <ThemeToggle />
+      </div>
+      <div className="px-4 pb-4">
+        <form action="/auth/signout" method="post">
           <button
             type="submit"
             className="w-full px-3 py-2 text-sm text-red-600 hover:text-red-700 dark:text-red-400"

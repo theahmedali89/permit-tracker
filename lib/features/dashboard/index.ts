@@ -23,6 +23,11 @@ export interface ForecastMonth {
   documents: number;
 }
 
+export interface StageExample {
+  title: string;
+  meta: string;
+}
+
 export interface DashboardData {
   hasSampleData: boolean;
   statusCounts: StatusCounts;
@@ -39,6 +44,25 @@ export interface DashboardData {
   forecast: ForecastMonth[];
   totalPermits: number;
   compliance: number;
+  /** One example permit per pipeline stage (first pending / first active). */
+  stageExamples: { applied: StageExample | null; approved: StageExample | null };
+  /** Pending inspection deadlines due today or later (head count). */
+  inspectionCount: number;
+}
+
+/** First permit of a given status, as a pipeline example (title + jurisdiction). */
+export function pickStageExamples(
+  rows: { status: string; permit_type?: string | null; permit_number?: string | null; jurisdiction?: string | null }[] | null | undefined
+): { applied: StageExample | null; approved: StageExample | null } {
+  const pick = (status: string): StageExample | null => {
+    const row = (rows || []).find((r) => r.status === status);
+    if (!row) return null;
+    return {
+      title: row.permit_number ? `${row.permit_type ?? "Permit"} #${row.permit_number}` : (row.permit_type ?? "Permit"),
+      meta: row.jurisdiction ?? "No jurisdiction recorded",
+    };
+  };
+  return { applied: pick("pending"), approved: pick("active") };
 }
 
 /** Tally permit statuses (single grouped query, counted in JS). */
@@ -101,31 +125,36 @@ export async function getDashboardData(supabase: any, orgId: string): Promise<Da
   const hasSampleData = (orgExtra as any)?.sample_data === true;
 
   // Single grouped status query (one round trip instead of four
-  // head-count queries); tallies are computed in JS below.
+  // head-count queries); tallies are computed in JS below. The select
+  // also carries the columns the pipeline examples need (no extra
+  // round trip).
   const { data: permitStatuses } = await supabase
     .from("permits")
-    .select("status")
+    .select("id, permit_type, permit_number, jurisdiction, status, expiration_date, created_at")
     .eq("organization_id", orgId);
   const statusCounts = tallyStatusCounts(permitStatuses as { status: string }[]);
   const activeCount = statusCounts.active;
   const pendingCount = statusCounts.pending;
   const expiringCount = statusCounts.expiring_soon;
   const expiredCount = statusCounts.expired;
+  const stageExamples = pickStageExamples(permitStatuses);
 
-  const [{ data: actionItems }, { data: upcoming }, { data: recentActivity }] = await Promise.all([
+  const todayStr = new Date().toISOString().split("T")[0];
+
+  const [{ data: actionItems }, { data: upcoming }, { data: recentActivity }, { count: inspectionCount }] = await Promise.all([
     supabase
       .from("permits")
-      .select("id, permit_type, permit_number, expiration_date, renewal_deadline, jurisdiction, status, projects(name)")
+      .select("id, permit_type, permit_number, expiration_date, renewal_deadline, jurisdiction, status, created_at, projects(name)")
       .eq("organization_id", orgId)
       .in("status", ["expired", "expiring_soon"])
       .order("expiration_date", { ascending: true })
       .limit(8),
     supabase
       .from("deadlines")
-      .select("id, deadline_type, resource_type, due_date, status")
+      .select("id, deadline_type, resource_type, resource_id, due_date, status")
       .eq("organization_id", orgId)
       .eq("status", "pending")
-      .gte("due_date", new Date().toISOString().split("T")[0])
+      .gte("due_date", todayStr)
       .order("due_date", { ascending: true })
       .limit(8),
     supabase
@@ -134,10 +163,17 @@ export async function getDashboardData(supabase: any, orgId: string): Promise<Da
       .eq("organization_id", orgId)
       .order("created_at", { ascending: false })
       .limit(8),
+    // Head count of pending inspection deadlines (pipeline stage 3).
+    supabase
+      .from("deadlines")
+      .select("id", { count: "exact", head: true })
+      .eq("organization_id", orgId)
+      .eq("resource_type", "inspection")
+      .eq("status", "pending")
+      .gte("due_date", todayStr),
   ]);
 
   // 6-month expiry forecast (permits + licenses + documents)
-  const todayStr = new Date().toISOString().split("T")[0];
   const sixMo = new Date();
   sixMo.setMonth(sixMo.getMonth() + 6);
   const sixMoStr = sixMo.toISOString().split("T")[0];
@@ -166,5 +202,7 @@ export async function getDashboardData(supabase: any, orgId: string): Promise<Da
     forecast,
     totalPermits,
     compliance,
+    stageExamples,
+    inspectionCount: inspectionCount ?? 0,
   };
 }

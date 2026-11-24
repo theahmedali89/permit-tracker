@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildForecast,
   computeCompliance,
+  pickStageExamples,
   tallyStatusCounts,
 } from "@/lib/features/dashboard";
 
@@ -63,5 +64,32 @@ describe("buildForecast", () => {
     expect(forecast[1]).toMatchObject({ label: "Dec", licenses: 1 });
     expect(forecast[2]).toMatchObject({ label: "Jan", permits: 1 });
     expect(forecast[5]).toMatchObject({ label: "Apr", permits: 0 });
+  });
+});
+
+describe("pickStageExamples", () => {
+  it("picks the first pending and first active permit", () => {
+    expect(
+      pickStageExamples([
+        { status: "expired", permit_type: "Roofing", permit_number: "R-1", jurisdiction: "Houston, TX" },
+        { status: "pending", permit_type: "Building", permit_number: "B-2", jurisdiction: "Austin, TX" },
+        { status: "active", permit_type: "Electrical", permit_number: "E-3", jurisdiction: "Dallas, TX" },
+      ])
+    ).toEqual({
+      applied: { title: "Building #B-2", meta: "Austin, TX" },
+      approved: { title: "Electrical #E-3", meta: "Dallas, TX" },
+    });
+  });
+  it("returns nulls when a stage has no permit", () => {
+    expect(pickStageExamples([])).toEqual({ applied: null, approved: null });
+    expect(pickStageExamples(null)).toEqual({ applied: null, approved: null });
+  });
+  it("falls back gracefully without a number or jurisdiction", () => {
+    expect(
+      pickStageExamples([{ status: "pending", permit_type: "Building" }])
+    ).toEqual({
+      applied: { title: "Building", meta: "No jurisdiction recorded" },
+      approved: null,
+    });
   });
 });

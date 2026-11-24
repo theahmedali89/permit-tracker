@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import FineStats from "./FineStats";
+import {
+  DashboardMockup,
+  HeroScene,
+  ThemeToggle,
+} from "@/lib/features/landing-redesign";
 
 const FEATURES: [string, string][] = [
   ["Reminders before every deadline", "Permit, license, and inspection expirations with 30/14/7/1-day warnings — plus follow-ups until it's handled, so nothing slips twice."],
@@ -36,69 +41,6 @@ export const LANDING_FAQ_JSON_LD = {
     acceptedAnswer: { "@type": "Answer", text: answer },
   })),
 };
-
-/** CSS-only dashboard mockup for the hero — no images, fully responsive. */
-function DashboardMockup() {
-  const rows: [string, string, string, string][] = [
-    ["BLD-2026-0418", "Austin, TX", "12 days left", "warn"],
-    ["ELEC-2026-0902", "Denver, CO", "45 days left", "ok"],
-    ["PLB-2026-0117", "Baltimore, MD", "3 days left", "warn"],
-    ["HVAC-2026-0731", "Chicago, IL", "Expired 2d ago", "bad"],
-  ];
-  return (
-    <div className="pw-glass pw-float-soft rounded-2xl p-4 sm:p-5 backdrop-blur-xl bg-white/20" aria-hidden="true">
-      {/* mock window bar */}
-      <div className="flex items-center gap-1.5 pb-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-white/60" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/60" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/60" />
-        <span className="ml-2 text-[11px] font-medium text-white/90">Permit Warden — Dashboard</span>
-      </div>
-      {/* alert banner */}
-      <div className="mb-3 flex items-center gap-2 rounded-xl bg-amber-400/30 border border-amber-300/50 px-3 py-2">
-        <svg className="h-4 w-4 shrink-0 text-amber-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM12 3.75l7.5 13.5h-15L12 3.75z" />
-        </svg>
-        <p className="text-[11px] sm:text-xs font-semibold text-amber-50">2 permits expiring within 14 days — reminders sent</p>
-      </div>
-      {/* mini KPI row */}
-      <div className="mb-3 grid grid-cols-3 gap-2">
-        {[
-          ["24", "Active"],
-          ["2", "Expiring"],
-          ["1", "Expired"],
-        ].map(([n, l]) => (
-          <div key={l} className="rounded-xl bg-white/25 border border-white/30 px-2 py-2 text-center">
-            <p className="text-base sm:text-lg font-bold text-white">{n}</p>
-            <p className="text-[10px] text-white/85">{l}</p>
-          </div>
-        ))}
-      </div>
-      {/* permit rows */}
-      <div className="space-y-2">
-        {rows.map(([id, city, left, tone]) => (
-          <div key={id} className="flex items-center justify-between gap-2 rounded-xl bg-white/25 border border-white/25 px-3 py-2">
-            <div className="min-w-0">
-              <p className="truncate font-mono text-[11px] sm:text-xs font-semibold text-white">{id}</p>
-              <p className="text-[10px] text-white/80">{city}</p>
-            </div>
-            <span
-              className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ${
-                tone === "ok"
-                  ? "bg-teal-400/25 text-teal-100 border border-teal-300/40"
-                  : tone === "warn"
-                    ? "bg-amber-400/25 text-amber-100 border border-amber-300/40"
-                    : "bg-red-400/25 text-red-100 border border-red-300/40"
-              }`}
-            >
-              {left}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function LandingPage() {
   return (
@@ -162,6 +104,7 @@ export default function LandingPage() {
               </div>
             </nav>
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <Link href="/signin" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
                 Sign in
               </Link>
@@ -223,6 +166,10 @@ export default function LandingPage() {
             <div className="mx-auto w-full max-w-md lg:max-w-none">
               <DashboardMockup />
             </div>
+          </div>
+          {/* Merged 3D hero scene: skyline + orbit + permit deck */}
+          <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+            <HeroScene />
           </div>
           {/* wave divider */}
           <svg className="relative block w-full text-white dark:text-gray-950" viewBox="0 0 1440 64" preserveAspectRatio="none" aria-hidden>

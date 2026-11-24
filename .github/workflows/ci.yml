@@ -1,0 +1,43 @@
+# Permit Warden CI — install, typecheck, test, build.
+# Claimed in CHANGELOG_MERGED.md but missing until 2026-11-24 (no
+# .github/ directory existed); added by the v2 audit fix pass.
+# NOTE: `npm run build` prerenders pages that need Supabase env vars;
+# it passes on Vercel (env set) and may fail in a bare sandbox without
+# NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY — see the
+# "Verification (honest status)" section of CHANGELOG_MERGED.md.
+# No secrets are committed here; env vars come from GitHub secrets.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        # --legacy-peer-deps matches the install command verified for
+        # this repo (see CHANGELOG_MERGED.md "Verification").
+        run: npm install --legacy-peer-deps
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}

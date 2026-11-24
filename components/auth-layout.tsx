@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { LoginArt } from "@/lib/features/landing-redesign";
 
 const HIGHLIGHTS = [
   {
@@ -31,10 +32,13 @@ export function AuthLayout({
   children,
   heading,
   subheading,
+  eyebrow,
 }: {
   children: React.ReactNode;
   heading: string;
   subheading: React.ReactNode;
+  /** Small pill above the heading (sign-in page: "Secure sign in"). */
+  eyebrow?: string;
 }) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-2">
@@ -54,7 +58,8 @@ export function AuthLayout({
         <div className="relative flex h-full flex-col justify-between p-10 xl:p-14">
           <Logo />
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-white xl:text-4xl">
+            <LoginArt />
+            <h1 className="mt-6 text-3xl font-semibold tracking-tight text-white xl:text-4xl">
               Every permit. Every license.
               <br />
               <span className="text-teal-200">Never a missed deadline.</span>
@@ -98,19 +103,32 @@ export function AuthLayout({
 
       {/* Form panel */}
       <div className="flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-teal-50 px-4 py-12 dark:from-gray-950 dark:via-gray-900 dark:to-teal-950 sm:px-8">
-        <div className="w-full max-w-md rounded-2xl border border-white/60 bg-white/70 p-6 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-gray-800/70 sm:p-8">
+        <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/60 bg-white/70 p-6 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-gray-800/70 sm:p-8">
+          <div className="absolute inset-x-0 top-0 h-[5px] bg-gradient-to-r from-blue-600 via-teal-500 to-amber-400" aria-hidden="true" />
           <div className="mb-8 lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2.5">
               <Image src="/logo-mark.png" alt="Permit Warden" width={40} height={40} className="h-10 w-10 rounded-xl shadow" />
               <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Permit Warden</span>
             </Link>
           </div>
+          {eyebrow && (
+            <span className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-blue-600/25 bg-blue-600/10 px-3 py-1 text-[0.7rem] font-extrabold uppercase tracking-[0.12em] text-blue-600 dark:border-blue-300/25 dark:bg-blue-300/10 dark:text-blue-300">
+              {eyebrow}
+            </span>
+          )}
           <h2 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
             {heading}
           </h2>
           <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">{subheading}</div>
           <div className="mt-8">{children}</div>
-          <p className="mt-8 text-center text-xs text-gray-500 dark:text-gray-500">
+          <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs font-semibold text-gray-500 dark:text-gray-400">
+            <svg className="h-[15px] w-[15px] shrink-0 text-teal-600 dark:text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10z" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+            186 AHJ portals · All 50 states
+          </p>
+          <p className="mt-4 text-center text-xs text-gray-500 dark:text-gray-500">
             <Link href="/blog" className="hover:text-gray-700 dark:hover:text-gray-300">
               Read our permit guides
             </Link>

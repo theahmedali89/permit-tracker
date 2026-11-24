@@ -20,6 +20,14 @@ Compliance Dashboard data.
   active/pending = 100 pts. No permits → 100%.
 - Presentation helpers (`daysUntil`, `formatDate`, `deadlineLabel`,
   `timeAgo`) stay in the page — they are rendering, not data.
+- Landing-redesign extension (additive only): the status query also
+  selects `permit_type` / `permit_number` / `jurisdiction` /
+  `expiration_date` / `created_at` so `pickStageExamples()` can
+  supply one example permit per pipeline stage; `actionItems`
+  carries `created_at` (journey "Applied" date); `upcoming` carries
+  `resource_id` (link an inspection deadline to its permit); and a
+  head-count query supplies `inspectionCount` (pending inspection
+  deadlines due today or later).
 
 ## Routes
 
