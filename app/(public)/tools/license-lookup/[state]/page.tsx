@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LICENSE_BOARDS, type LicenseBoard } from "@/lib/shared/license-boards";
+import {
+  LICENSE_BOARDS,
+  LICENSE_BOARD_DETAILS,
+  type LicenseBoard,
+} from "@/lib/shared/license-boards";
 import { STATE_NAMES, stateSlug, stateCodeFromSlug } from "../../../ahj/_lib";
 
 export function generateStaticParams() {
@@ -80,6 +84,7 @@ export default async function LicenseLookupStatePage({
     })),
   };
   const others = LICENSE_BOARDS.filter((b) => b.code !== board.code);
+  const detail = LICENSE_BOARD_DETAILS[board.code];
 
   return (
     <>
@@ -158,6 +163,220 @@ export default async function LicenseLookupStatePage({
               ))}
             </ul>
           </section>
+
+          {detail?.recordShows && (
+            <section className="mt-14">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                What the {board.boardShort} record shows
+              </h2>
+              <ul className="mt-4 space-y-2">
+                {detail.recordShows.map((item) => (
+                  <li
+                    key={item}
+                    className="rounded-xl border border-white/60 bg-white/70 px-5 py-3 text-sm text-gray-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-gray-900/70 dark:text-gray-300"
+                  >
+                    ✓ {item}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {detail?.licenseTypes && (
+            <section className="mt-14">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {board.state} license types
+              </h2>
+              <div className="mt-4 space-y-3">
+                {detail.licenseTypes.map((t) => (
+                  <div
+                    key={t.name}
+                    className="rounded-2xl border border-white/60 bg-white/70 p-5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-gray-900/70"
+                  >
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{t.name}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                      {t.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {detail?.fees && (
+            <section className="mt-14">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {board.state} contractor license fees
+              </h2>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                Checked against the official {board.boardShort} fee information on
+                November 25, 2026. Fees change — confirm on the board&apos;s site before
+                you budget.
+              </p>
+              <div className="mt-4 overflow-hidden rounded-2xl border border-white/60 bg-white/70 shadow-sm backdrop-blur dark:border-white/10 dark:bg-gray-900/70">
+                {detail.fees.map((fee, i) => (
+                  <div
+                    key={fee.item}
+                    className={
+                      i > 0
+                        ? "border-t border-gray-200/70 px-5 py-4 dark:border-white/10"
+                        : "px-5 py-4"
+                    }
+                  >
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="font-semibold text-gray-900 dark:text-white">{fee.item}</p>
+                      <p className="font-bold text-gray-900 dark:text-white">{fee.amount}</p>
+                    </div>
+                    {fee.note && (
+                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{fee.note}</p>
+                    )}
+                    {fee.sourceUrl && (
+                      <p className="mt-1 text-xs">
+                        <a
+                          href={fee.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sky-600 hover:text-sky-700 dark:text-sky-400"
+                        >
+                          Official source ↗
+                        </a>
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {detail?.renewal && (
+            <section className="mt-14">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Renewing a {board.state} license
+              </h2>
+              <div className="mt-4 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-gray-900/70">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <strong className="text-gray-900 dark:text-white">Cycle:</strong>{" "}
+                  {detail.renewal.cycle}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                  {detail.renewal.howTo}
+                </p>
+                {detail.renewal.lateFee && (
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                    <strong className="text-gray-900 dark:text-white">Late renewal:</strong>{" "}
+                    {detail.renewal.lateFee}
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+
+          {detail?.bondInsurance && (
+            <section className="mt-14">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Bond and insurance requirements in {board.state}
+              </h2>
+              <div className="mt-4 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-gray-900/70">
+                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                  <strong className="text-gray-900 dark:text-white">Bond:</strong>{" "}
+                  {detail.bondInsurance.bond}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                  <strong className="text-gray-900 dark:text-white">Insurance:</strong>{" "}
+                  {detail.bondInsurance.insurance}
+                </p>
+                {detail.bondInsurance.note && (
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                    {detail.bondInsurance.note}
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+
+          {detail?.requirements && (
+            <section className="mt-14">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Who can get licensed in {board.state}
+              </h2>
+              <div className="mt-4 space-y-3">
+                {(
+                  [
+                    ["Exam", detail.requirements.exam],
+                    ["Experience", detail.requirements.experience],
+                    ["Education", detail.requirements.education],
+                    ["Good to know", detail.requirements.other],
+                  ] as Array<[string, string | undefined]>
+                )
+                  .filter(([, v]) => v)
+                  .map(([label, v]) => (
+                    <div
+                      key={label}
+                      className="rounded-2xl border border-white/60 bg-white/70 p-5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-gray-900/70"
+                    >
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{label}</h3>
+                      <p className="mt-1 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                        {v}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            </section>
+          )}
+
+          {detail?.complaintProcess && (
+            <section className="mt-14">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Filing a complaint in {board.state}
+              </h2>
+              <div className="mt-4 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-gray-900/70">
+                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                  {detail.complaintProcess.howTo}
+                </p>
+                {detail.complaintProcess.whatHappens && (
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                    {detail.complaintProcess.whatHappens}
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+
+          {detail && (detail.processingTime || detail.sources) && (
+            <section className="mt-14 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-gray-900/70">
+              {detail.processingTime && (
+                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                  <strong className="text-gray-900 dark:text-white">Processing time:</strong>{" "}
+                  {detail.processingTime}
+                </p>
+              )}
+              {detail.sources && (
+                <>
+                  <h2 className="mt-4 text-base font-bold text-gray-900 dark:text-white">
+                    Official sources
+                  </h2>
+                  <ul className="mt-2 space-y-1">
+                    {detail.sources.map((s) => (
+                      <li key={s} className="break-all text-xs">
+                        <a
+                          href={s}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sky-600 hover:text-sky-700 dark:text-sky-400"
+                        >
+                          {s}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                The licensing details on this page were verified against these official
+                sources on November 25, 2026.
+              </p>
+            </section>
+          )}
 
           <section className="mt-14">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
