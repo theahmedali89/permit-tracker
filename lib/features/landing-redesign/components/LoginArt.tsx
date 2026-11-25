@@ -1,4 +1,4 @@
-import styles from "../landing-redesign.module.css";
+import "../landing-redesign.css";
 
 /**
  * Mini orbit + skyline motif for the sign-in brand panel (from the
@@ -9,49 +9,49 @@ import styles from "../landing-redesign.module.css";
  */
 export function LoginArt() {
   return (
-    <div className={styles.loginArt} aria-hidden="true">
-      <div className={styles.miniOrbit}>
-        <div className={styles.oplane}>
-          <div className={`${styles.ring} ${styles.r1}`} />
-          <div className={`${styles.ring} ${styles.r2}`} />
-          <div className={`${styles.ring} ${styles.r3}`} />
-          <div className={`${styles.arm} ${styles.armA}`}>
-            <div className={styles.holder}>
-              <div className={styles.sat} />
+    <div className="lr-loginArt" aria-hidden="true">
+      <div className="lr-miniOrbit">
+        <div className="lr-oplane">
+          <div className={`lr-ring lr-r1`} />
+          <div className={`lr-ring lr-r2`} />
+          <div className={`lr-ring lr-r3`} />
+          <div className={`lr-arm lr-armA`}>
+            <div className="lr-holder">
+              <div className="lr-sat" />
             </div>
           </div>
-          <div className={`${styles.arm} ${styles.armB}`}>
-            <div className={styles.holder}>
-              <div className={`${styles.sat} ${styles.satBlue}`} />
+          <div className={`lr-arm lr-armB`}>
+            <div className="lr-holder">
+              <div className={`lr-sat lr-satBlue`} />
             </div>
-            <div className={styles.holder} style={{ top: "100%" }}>
-              <div className={styles.sat} />
+            <div className="lr-holder" style={{ top: "100%" }}>
+              <div className="lr-sat" />
             </div>
           </div>
-          <div className={`${styles.arm} ${styles.armC}`}>
-            <div className={styles.holder}>
-              <div className={`${styles.sat} ${styles.satBlue}`} />
+          <div className={`lr-arm lr-armC`}>
+            <div className="lr-holder">
+              <div className={`lr-sat lr-satBlue`} />
             </div>
           </div>
         </div>
-        <div className={styles.miniDial}>
+        <div className="lr-miniDial">
           <i>92%</i>
         </div>
       </div>
-      <span className={`${styles.loginChip} ${styles.chipA}`}>
-        <span className={`${styles.dot} ${styles.dotAmber}`} />
+      <span className={`lr-loginChip lr-chipA`}>
+        <span className={`lr-dot lr-dotAmber`} />
         Reminders before every deadline
       </span>
-      <span className={`${styles.loginChip} ${styles.chipB}`}>
-        <span className={`${styles.dot} ${styles.dotTeal}`} />
+      <span className={`lr-loginChip lr-chipB`}>
+        <span className={`lr-dot lr-dotTeal`} />
         Apply-by dates built in
       </span>
-      <div className={styles.miniSky}>
-        <div className={styles.bldg} style={{ left: "2%", width: 52, height: 90 }} />
-        <div className={styles.bldg} style={{ left: "20%", width: 64, height: 130 }} />
-        <div className={styles.bldg} style={{ left: "42%", width: 48, height: 74 }} />
-        <div className={styles.bldg} style={{ left: "62%", width: 70, height: 112 }} />
-        <div className={styles.bldg} style={{ left: "84%", width: 54, height: 84 }} />
+      <div className="lr-miniSky">
+        <div className="lr-bldg" style={{ left: "2%", width: 52, height: 90 }} />
+        <div className="lr-bldg" style={{ left: "20%", width: 64, height: 130 }} />
+        <div className="lr-bldg" style={{ left: "42%", width: 48, height: 74 }} />
+        <div className="lr-bldg" style={{ left: "62%", width: 70, height: 112 }} />
+        <div className="lr-bldg" style={{ left: "84%", width: 54, height: 84 }} />
       </div>
     </div>
   );

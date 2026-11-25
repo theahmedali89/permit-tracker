@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import styles from "../landing-redesign.module.css";
+import "../landing-redesign.css";
 
 /**
  * Merged 3D hero scene — city skyline (back) + deadline orbit
@@ -57,7 +57,7 @@ function Building({
 }) {
   return (
     <div
-      className={`${styles.bldg}${antenna ? ` ${styles.antenna}` : ""}`}
+      className={`lr-bldg${antenna ? ` lr-antenna` : ""}`}
       style={{ left, width, height }}
     />
   );
@@ -124,29 +124,29 @@ export function HeroScene() {
 
   return (
     <>
-      <div className={styles.sceneWrap} aria-hidden="true">
-        <div ref={sceneRef} className={styles.scene}>
+      <div className="lr-sceneWrap" aria-hidden="true">
+        <div ref={sceneRef} className="lr-scene">
           {/* Base layer — skyline */}
-          <div className={styles.skyline}>
-            <div className={`${styles.layer} ${styles.slBack}`}>
+          <div className="lr-skyline">
+            <div className={`lr-layer lr-slBack`}>
               {SKYLINE_BACK.map((b, i) => (
                 <Building key={i} {...b} />
               ))}
             </div>
-            <div className={`${styles.layer} ${styles.slMid}`}>
+            <div className={`lr-layer lr-slMid`}>
               {SKYLINE_MID.map((b, i) => (
                 <Building key={i} {...b} />
               ))}
-              <div className={styles.crane} aria-hidden="true">
-                <span className={styles.mast} />
-                <span className={styles.jib} />
-                <span className={styles.counterj} />
-                <span className={styles.apex} />
-                <span className={styles.cable} />
-                <span className={styles.load} />
+              <div className="lr-crane" aria-hidden="true">
+                <span className="lr-mast" />
+                <span className="lr-jib" />
+                <span className="lr-counterj" />
+                <span className="lr-apex" />
+                <span className="lr-cable" />
+                <span className="lr-load" />
               </div>
             </div>
-            <div className={`${styles.layer} ${styles.slFront}`}>
+            <div className={`lr-layer lr-slFront`}>
               {SKYLINE_FRONT.map((b, i) => (
                 <Building key={i} {...b} />
               ))}
@@ -154,67 +154,67 @@ export function HeroScene() {
           </div>
 
           {/* Middle layer — orbit */}
-          <div className={styles.orbit}>
-            <div className={styles.oplane}>
-              <div className={`${styles.ring} ${styles.r1}`} />
-              <div className={`${styles.ring} ${styles.r2}`} />
-              <div className={`${styles.ring} ${styles.r3}`} />
-              <div className={`${styles.arm} ${styles.armA}`}>
-                <div className={styles.holder}>
-                  <div className={styles.counter}>
-                    <div className={styles.ochip}>
-                      <span className={`${styles.dot} ${styles.dotAmber}`} />
+          <div className="lr-orbit">
+            <div className="lr-oplane">
+              <div className={`lr-ring lr-r1`} />
+              <div className={`lr-ring lr-r2`} />
+              <div className={`lr-ring lr-r3`} />
+              <div className={`lr-arm lr-armA`}>
+                <div className="lr-holder">
+                  <div className="lr-counter">
+                    <div className="lr-ochip">
+                      <span className={`lr-dot lr-dotAmber`} />
                       <b>Austin</b>
                       <span>Building · TX</span>
-                      <span className={styles.days}>12d left</span>
+                      <span className="lr-days">12d left</span>
                     </div>
                   </div>
                 </div>
-                <div className={styles.holder} style={{ top: "100%" }}>
-                  <div className={styles.sat} />
+                <div className="lr-holder" style={{ top: "100%" }}>
+                  <div className="lr-sat" />
                 </div>
               </div>
-              <div className={`${styles.arm} ${styles.armB}`}>
-                <div className={styles.holder}>
-                  <div className={styles.counter}>
-                    <div className={styles.ochip}>
-                      <span className={`${styles.dot} ${styles.dotAmber}`} />
+              <div className={`lr-arm lr-armB`}>
+                <div className="lr-holder">
+                  <div className="lr-counter">
+                    <div className="lr-ochip">
+                      <span className={`lr-dot lr-dotAmber`} />
                       <b>Dallas</b>
                       <span>Electrical · TX</span>
-                      <span className={styles.days}>5d left</span>
+                      <span className="lr-days">5d left</span>
                     </div>
                   </div>
                 </div>
-                <div className={styles.holder} style={{ top: "100%" }}>
-                  <div className={styles.counter}>
-                    <div className={styles.ochip}>
-                      <span className={`${styles.dot} ${styles.dotBlue}`} />
+                <div className="lr-holder" style={{ top: "100%" }}>
+                  <div className="lr-counter">
+                    <div className="lr-ochip">
+                      <span className={`lr-dot lr-dotBlue`} />
                       <b>Phoenix</b>
                       <span>HVAC · AZ</span>
-                      <span className={`${styles.days} ${styles.daysOk}`}>19d left</span>
+                      <span className={`lr-days lr-daysOk`}>19d left</span>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className={`${styles.arm} ${styles.armC}`}>
-                <div className={styles.holder}>
-                  <div className={styles.counter}>
-                    <div className={styles.ochip}>
-                      <span className={`${styles.dot} ${styles.dotTeal}`} />
+              <div className={`lr-arm lr-armC`}>
+                <div className="lr-holder">
+                  <div className="lr-counter">
+                    <div className="lr-ochip">
+                      <span className={`lr-dot lr-dotTeal`} />
                       <b>Houston</b>
                       <span>Roofing · TX</span>
-                      <span className={`${styles.days} ${styles.daysOk}`}>21d left</span>
+                      <span className={`lr-days lr-daysOk`}>21d left</span>
                     </div>
                   </div>
                 </div>
-                <div className={styles.holder} style={{ top: "100%" }}>
-                  <div className={`${styles.sat} ${styles.satBlue}`} />
+                <div className="lr-holder" style={{ top: "100%" }}>
+                  <div className={`lr-sat lr-satBlue`} />
                 </div>
               </div>
             </div>
-            <div className={styles.dialWrap}>
-              <div className={styles.dial}>
-                <div className={styles.dialIn}>
+            <div className="lr-dialWrap">
+              <div className="lr-dial">
+                <div className="lr-dialIn">
                   <div>
                     <b>92%</b>
                     <span>Compliance score</span>
@@ -225,13 +225,13 @@ export function HeroScene() {
           </div>
 
           {/* Front layer — fanned permit deck */}
-          <div className={styles.deck}>
-            <article className={styles.dc1}>
-              <div className={styles.dcard}>
-                <span className={`${styles.pillL} ${styles.pillOk}`}>Active</span>
-                <span className={styles.city}>Austin, TX</span>
+          <div className="lr-deck">
+            <article className="lr-dc1">
+              <div className="lr-dcard">
+                <span className={`lr-pillL lr-pillOk`}>Active</span>
+                <span className="lr-city">Austin, TX</span>
                 <h3>Building Permit</h3>
-                <span className={styles.num}>#2024-1147 · Travis County</span>
+                <span className="lr-num">#2024-1147 · Travis County</span>
                 <dl>
                   <div>
                     <dt>Expires</dt>
@@ -244,12 +244,12 @@ export function HeroScene() {
                 </dl>
               </div>
             </article>
-            <article className={styles.dc2}>
-              <div className={styles.dcard}>
-                <span className={`${styles.pillL} ${styles.pillWarn}`}>Renew soon</span>
-                <span className={styles.city}>Dallas, TX</span>
+            <article className="lr-dc2">
+              <div className="lr-dcard">
+                <span className={`lr-pillL lr-pillWarn`}>Renew soon</span>
+                <span className="lr-city">Dallas, TX</span>
                 <h3>Electrical Permit</h3>
-                <span className={styles.num}>#EL-88412 · Dallas County</span>
+                <span className="lr-num">#EL-88412 · Dallas County</span>
                 <dl>
                   <div>
                     <dt>Expires</dt>
@@ -262,12 +262,12 @@ export function HeroScene() {
                 </dl>
               </div>
             </article>
-            <article className={styles.dc3}>
-              <div className={styles.dcard}>
-                <span className={`${styles.pillL} ${styles.pillOk}`}>Active</span>
-                <span className={styles.city}>Houston, TX</span>
+            <article className="lr-dc3">
+              <div className="lr-dcard">
+                <span className={`lr-pillL lr-pillOk`}>Active</span>
+                <span className="lr-city">Houston, TX</span>
                 <h3>Roofing Permit</h3>
-                <span className={styles.num}>#RF-30921 · Harris County</span>
+                <span className="lr-num">#RF-30921 · Harris County</span>
                 <dl>
                   <div>
                     <dt>Expires</dt>
@@ -281,10 +281,10 @@ export function HeroScene() {
               </div>
             </article>
           </div>
-          <div className={styles.ground} />
+          <div className="lr-ground" />
         </div>
       </div>
-      <p className={styles.sceneCap}>
+      <p className="lr-sceneCap">
         One 3D scene, three layers — <b>city skyline</b> behind, <b>deadline orbit</b> in the
         middle, <b>permit deck</b> up front. Move your mouse over the hero to tilt it.
       </p>
